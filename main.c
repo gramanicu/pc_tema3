@@ -1,7 +1,6 @@
 #include <stdio.h>
-#include "utils.h"
-
-void generateMap(map *m, char radius, FILE *in);
+#include "game.h"
+#include "map.h"
 
 int main() {
     map m;

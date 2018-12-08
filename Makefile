@@ -1,7 +1,7 @@
 # Copyright 2018 Grama Nicolae
 
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -O3
+CFLAGS = -Wall -Wextra -pedantic -std=c99 -O3 -Wno-unused-result
 LFLAGS = -lm
 exe = snowfight
 src = $(wildcard *.c)
@@ -24,6 +24,7 @@ build: $(obj)
 # ruleaza programul
 run: build
 		./$(exe)
+.PHONY:run
 
 #arhiveaza tema
 pack:
