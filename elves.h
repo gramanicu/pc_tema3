@@ -40,4 +40,7 @@ void getPosition(elf *e, unsigned int *x, unsigned int *y);
 // Changes the position of an elf
 void setPosition(elf *e, unsigned int x, unsigned int y);
 
+// The elf will change gloves (if he needs)
+void takeGloves(elf *e, map *m);
+
 #endif

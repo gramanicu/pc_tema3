@@ -124,8 +124,8 @@ int movePlayer(elf *players, unsigned int id, char move) {
         fprintf(out, "%s fell of the glacier.\n", (players+id)->name);
     
     } else {
-    //take gloves - could be done directly by the function in elves
-    //check enemy - ok = 0 if killed
+        takeGloves(players+id, m);
+        //check enemy - ok = 0 if killed
     }
     return 1;
 }
