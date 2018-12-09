@@ -31,6 +31,9 @@ void eliminateElf(elf *players, unsigned int id, unsigned int *count,
 // Checks if the game is over, says who won and closes the program
 void checkFinished(elf *players, unsigned int playerCount, FILE *out);
 
+// Check if the elf has fallen off the glacier
+char isOut(elf *players, unsigned int id ,map *m);
+
 // Here is all the game logic
 void startGame(char *files);
 

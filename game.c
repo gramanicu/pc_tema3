@@ -103,7 +103,7 @@ void checkFinished(elf *players, unsigned int playerCount, FILE *out) {
 }
 
 int movePlayer(elf *players, unsigned int id, char move) {
-    unsigned int x, y, ok = 1;
+    unsigned int x, y;
     getPosition(players + id, &x, &y);
     switch (move) {
         case 'U':
@@ -119,8 +119,21 @@ int movePlayer(elf *players, unsigned int id, char move) {
             setPosition(players + id, x, y-1);
             break;
     }
-    //check out - ok = 0 if killed
+    if(isOut(players, id, m)) {
+        return 0;
+        fprintf(out, "%s fell of the glacier.\n", (players+id)->name);
+    
+    } else {
     //take gloves - could be done directly by the function in elves
     //check enemy - ok = 0 if killed
-    return ok;
+    }
+    return 1;
+}
+
+char isOut(elf *players, unsigned int id ,map *m) {
+    unsigned int i;
+    if (!checkPosition(players + id, m)) {
+        return 1;
+    }
+    return 0;
 }
