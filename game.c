@@ -29,12 +29,12 @@ void prepareGame(map *m, elf **players, unsigned int *count, FILE *in,
     generateMap(m, radius, in);
     *players = calloc(playerCount, sizeof(elf));
     spawnPlayers(*players, playerCount, in);
-    checkLanding(*players, playerCount, m, out);
+    checkLanding(*players, &playerCount, m, out);
+
+    *count = playerCount;
 
     // printPlayers(*players, playerCount);
     // printHeightmap(m);
-
-    *count = playerCount;
 }
 
 void spawnPlayers(elf *players, unsigned int playerCount, FILE *in) {
@@ -57,14 +57,28 @@ void printPlayers(elf *players, unsigned int playerCount) {
     }
 }
 
-void checkLanding(elf *players, unsigned int playerCount, map *m, FILE *out) {
+void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out) {
     unsigned int i;
-    for (i = 0; i < playerCount; i++) {
+    for (i = 0; i < *playerCount; i++) {
         // If he hasn't landed on the glacier
         if (!checkPosition(players + i, m)) {
             fprintf(out, "%s has missed the glacier.\n", (players + i)->name);
+            eliminateElf(players, i, playerCount, out);
         }
     }
+}
+
+void eliminateElf(elf *players, unsigned int id, unsigned int *count, FILE *out) {
+    unsigned int i;
+    for(i=id; i<*count-1; i++) {
+        elf *aux = (players+i+1);
+        releaseElf(players + i);
+        createElf(players+i, aux->name, aux->x, aux->y, aux->hp, aux->stamina);
+    }
+    releaseElf(players + *count - 1);
+    *count = *count - 1;
+
+    checkFinished(players ,*count, out);
 }
 
 void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
@@ -77,4 +91,11 @@ void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
     free(players);
     fclose(in);
     fclose(out);
+}
+
+void checkFinished(elf *players, unsigned int playerCount, FILE *out) {
+    if(playerCount==1) {
+        fprintf(out, "%s has won!\n", players->name);
+        exit(0);
+    }
 }
