@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
-#include "elves.h"
 #include <stdio.h>
+#include "elves.h"
 
 #define MAX_SIZE 100
 
@@ -12,6 +12,6 @@ unsigned char getBit(int x, int n);
 // centered in (0, 0), using the pythagorean theorem
 char isInRadius(elf *e, unsigned int r);
 
-void prepareFiles(FILE **in, FILE **out,char *filename);
+void prepareFiles(FILE **in, FILE **out, char *filename);
 
 #endif

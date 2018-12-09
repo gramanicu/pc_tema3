@@ -1,5 +1,6 @@
 #ifndef ELVES_H
 #define ELVES_H
+#include "map.h"
 
 typedef struct elfStruct elf;
 
@@ -27,7 +28,10 @@ void setGloves(elf *e, int gloves);
 // Returns the type of gloves the elf has
 unsigned int getGloves(elf *e);
 
-// show an elf information - for development purposes
+// Show an elf information - for development purposes
 void printElf(elf *e);
+
+// Checks if an elf is still on the glacier
+int checkPosition(elf *e, map *m);
 
 #endif

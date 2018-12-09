@@ -2,21 +2,8 @@
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-// Reads the input to prepare the game
-void prepareGame(map *m, elf **players, unsigned int *count, FILE *in) {
-    unsigned int radius, playerCount;
-
-    fscanf(in, "%ud", &radius);
-    fscanf(in, "%ud", &playerCount);
-
-    generateMap(m, radius, in);
-    *players = calloc(playerCount, sizeof(elf));
-    spawnPlayers(*players, playerCount, in);
-    printPlayers(*players, playerCount);
-    printHeightmap(m);
-    *count = playerCount;
-}
+#include "elves.h"
+#include "map.h"
 
 void startGame(char *files) {
     map m;
@@ -29,6 +16,24 @@ void startGame(char *files) {
     prepareGame(&m, &players, &playerCount, in);
     // Game
     releaseMemory(&m, players, playerCount, in, out);
+}
+
+// Reads the input to prepare the game
+void prepareGame(map *m, elf **players, unsigned int *count, FILE *in) {
+    unsigned int radius, playerCount;
+
+    fscanf(in, "%ud", &radius);
+    fscanf(in, "%ud", &playerCount);
+
+    generateMap(m, radius, in);
+    *players = calloc(playerCount, sizeof(elf));
+    spawnPlayers(*players, playerCount, in);
+    checkLanding(*players, playerCount, m);
+
+    // printPlayers(*players, playerCount);
+    // printHeightmap(m);
+
+    *count = playerCount;
 }
 
 void spawnPlayers(elf *players, unsigned int playerCount, FILE *in) {
@@ -51,7 +56,18 @@ void printPlayers(elf *players, unsigned int playerCount) {
     }
 }
 
-void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in, FILE *out) {
+void checkLanding(elf *players, unsigned int playerCount, map *m) {
+    unsigned int i;
+    for (i = 0; i < playerCount; i++) {
+        // If he hasn't landed on the glacier
+        if (!checkPosition(players + i, m)) {
+            printf("%s has missed the glacier.\n", (players + i)->name);
+        }
+    }
+}
+
+void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
+                   FILE *out) {
     unsigned int i;
     releaseMap(m);
     for (i = 0; i < playerCount; i++) {

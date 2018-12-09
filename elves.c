@@ -2,6 +2,8 @@
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "map.h"
+#include "utils.h"
 
 void createElf(elf *e, char *name, int x, int y, int hp, int stamina) {
     e->name = calloc(strlen(name) + 1, sizeof(char));
@@ -14,6 +16,8 @@ void createElf(elf *e, char *name, int x, int y, int hp, int stamina) {
 }
 
 void releaseElf(elf *e) { free(e->name); }
+
+int checkPosition(elf *e, map *m) { return isInRadius(e, m->radius); }
 
 void printElf(elf *e) {
     printf("Name : %s\n", e->name);
