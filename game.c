@@ -68,17 +68,19 @@ void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out) {
     }
 }
 
-void eliminateElf(elf *players, unsigned int id, unsigned int *count, FILE *out) {
+void eliminateElf(elf *players, unsigned int id, unsigned int *count,
+                  FILE *out) {
     unsigned int i;
-    for(i=id; i<*count-1; i++) {
-        elf *aux = (players+i+1);
+    for (i = id; i < *count - 1; i++) {
+        elf *aux = (players + i + 1);
         releaseElf(players + i);
-        createElf(players+i, aux->name, aux->x, aux->y, aux->hp, aux->stamina);
+        createElf(players + i, aux->name, aux->x, aux->y, aux->hp,
+                  aux->stamina);
     }
     releaseElf(players + *count - 1);
     *count = *count - 1;
 
-    checkFinished(players ,*count, out);
+    checkFinished(players, *count, out);
 }
 
 void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
@@ -94,8 +96,31 @@ void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
 }
 
 void checkFinished(elf *players, unsigned int playerCount, FILE *out) {
-    if(playerCount==1) {
+    if (playerCount == 1) {
         fprintf(out, "%s has won!\n", players->name);
         exit(0);
     }
+}
+
+int movePlayer(elf *players, unsigned int id, char move) {
+    unsigned int x, y, ok = 1;
+    getPosition(players + id, &x, &y);
+    switch (move) {
+        case 'U':
+            setPosition(players + id, x-1, y);
+            break;
+        case 'D':
+            setPosition(players + id, x+1, y);
+            break;
+        case 'R':
+            setPosition(players + id, x, y+1);
+            break;
+        case 'L':
+            setPosition(players + id, x, y-1);
+            break;
+    }
+    //check out - ok = 0 if killed
+    //take gloves - could be done directly by the function in elves
+    //check enemy - ok = 0 if killed
+    return ok;
 }

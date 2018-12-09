@@ -8,7 +8,7 @@
 char isInRadius(elf *e, unsigned int r) {
     unsigned int x = e->x;
     unsigned int y = e->y;
-    double lenght = sqrt((x-r)*(x-r) + (y-r)*(y-r));
+    double lenght = sqrt((x - r) * (x - r) + (y - r) * (y - r));
     return lenght <= r ? 1 : 0;
 }
 

@@ -34,4 +34,10 @@ void printElf(elf *e);
 // Checks if an elf is still on the glacier
 int checkPosition(elf *e, map *m);
 
+// Returns through 2 pointers (x, y) an elf's position
+void getPosition(elf *e, unsigned int *x, unsigned int *y);
+
+// Changes the position of an elf
+void setPosition(elf *e, unsigned int x, unsigned int y);
+
 #endif

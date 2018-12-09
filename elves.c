@@ -30,3 +30,23 @@ void printElf(elf *e) {
 void setGloves(elf *e, int gloves) { e->dmg = gloves; }
 
 unsigned int getGloves(elf *e) { return e->dmg; }
+
+void getPosition(elf *e, unsigned int *x, unsigned int *y) {
+    *x = e->x;
+    *y = e->y;
+}
+
+void takeGloves(elf *e, map *m) {
+    // If he found better gloves, he swaps them
+    if (e->dmg < getCellGloves(m, e->x, e->y)) {
+        unsigned int aux;
+        aux = e->dmg;
+        e->dmg = getCellGloves(m, e->x, e->y);
+        setCellGloves(m, e->x, e->y, aux);
+    }
+}
+
+void setPosition(elf *e, unsigned int x, unsigned int y) {
+    e->x = x;
+    e->y = y;
+}

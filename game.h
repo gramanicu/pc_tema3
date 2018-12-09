@@ -25,7 +25,8 @@ void printPlayers(elf *players, unsigned int playerCount);
 void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out);
 
 // Sends an elf back to santa and modifies the total number of players
-void eliminateElf(elf *players, unsigned int id, unsigned int *count, FILE *out);
+void eliminateElf(elf *players, unsigned int id, unsigned int *count,
+                  FILE *out);
 
 // Checks if the game is over, says who won and closes the program
 void checkFinished(elf *players, unsigned int playerCount, FILE *out);

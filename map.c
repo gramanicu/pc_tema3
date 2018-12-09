@@ -22,11 +22,11 @@ void setCellHeight(map *m, int x, int y, unsigned int height) {
     m->cells[y * mapDiameter(m) + x].height = height;
 }
 
-void setCellGloves(map *m, int x, int y, char glove) {
+void setCellGloves(map *m, int x, int y, unsigned int glove) {
     m->cells[y * mapDiameter(m) + x].glove = glove;
 }
 
-void setCell(map *m, int x, int y, unsigned int height, char glove) {
+void setCell(map *m, int x, int y, unsigned int height, unsigned int glove) {
     setCellGloves(m, x, y, glove);
     setCellHeight(m, x, y, height);
 }
@@ -35,7 +35,7 @@ unsigned int getCellHeight(map *m, int x, int y) {
     return m->cells[y * mapDiameter(m) + x].height;
 }
 
-unsigned int getCellGlove(map *m, int x, int y) {
+unsigned int getCellGloves(map *m, int x, int y) {
     return m->cells[y * mapDiameter(m) + x].glove;
 }
 

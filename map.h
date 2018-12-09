@@ -44,16 +44,16 @@ void printSnowstorm(snowstorm *s);
 void setCellHeight(map *m, int x, int y, unsigned int height);
 
 // Set the glove type in a cell
-void setCellGloves(map *m, int x, int y, char glove);
+void setCellGloves(map *m, int x, int y, unsigned int glove);
 
 // Set both the cell height and glove type
-void setCell(map *m, int x, int y, unsigned int height, char glove);
+void setCell(map *m, int x, int y, unsigned int height, unsigned intglove);
 
 // Returns a cell height
 unsigned int getCellHeight(map *m, int x, int y);
 
 // Returns a cell glove type
-unsigned int getCellGlove(map *m, int x, int y);
+unsigned int getCellGloves(map *m, int x, int y);
 
 // Returns the map diameter (size of one side of the square)
 unsigned int mapDiameter(map *m);
