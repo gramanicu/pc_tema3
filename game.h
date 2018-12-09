@@ -8,7 +8,8 @@
     the map, players and player count, so we can deallocate the
     memory at the end of execution
 */
-void prepareGame(map *m, elf **players, unsigned int *count, FILE *in);
+void prepareGame(map *m, elf **players, unsigned int *count, FILE *in,
+                 FILE *out);
 
 // Frees all dinamically allocated memory and closes the input file
 void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
@@ -21,7 +22,7 @@ void spawnPlayers(elf *players, unsigned int playerCount, FILE *in);
 void printPlayers(elf *players, unsigned int playerCount);
 
 // Check if any player has missed the glacier
-void checkLanding(elf *players, unsigned int playerCount, map *m);
+void checkLanding(elf *players, unsigned int playerCount, map *m, FILE *out);
 
 // Here is all the game logic
 void startGame(char *files);

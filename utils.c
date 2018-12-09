@@ -6,10 +6,10 @@
 #include "elves.h"
 
 char isInRadius(elf *e, unsigned int r) {
-    int x = e->x;
-    int y = e->y;
-    int lat = 2*r+1;
-    return (x>=0 && y>=0 && x<lat && y<lat) ? 1 : 0;
+    unsigned int x = e->x;
+    unsigned int y = e->y;
+    double lenght = sqrt((x-r)*(x-r) + (y-r)*(y-r));
+    return lenght <= r ? 1 : 0;
 }
 
 unsigned char getBit(int x, int n) { return (x >> (8 * n)) & 0xFF; }

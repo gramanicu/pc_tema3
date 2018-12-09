@@ -13,13 +13,14 @@ void startGame(char *files) {
     FILE *in, *out;
 
     prepareFiles(&in, &out, files);
-    prepareGame(&m, &players, &playerCount, in);
+    prepareGame(&m, &players, &playerCount, in, out);
     // Game
     releaseMemory(&m, players, playerCount, in, out);
 }
 
 // Reads the input to prepare the game
-void prepareGame(map *m, elf **players, unsigned int *count, FILE *in) {
+void prepareGame(map *m, elf **players, unsigned int *count, FILE *in,
+                 FILE *out) {
     unsigned int radius, playerCount;
 
     fscanf(in, "%ud", &radius);
@@ -28,7 +29,7 @@ void prepareGame(map *m, elf **players, unsigned int *count, FILE *in) {
     generateMap(m, radius, in);
     *players = calloc(playerCount, sizeof(elf));
     spawnPlayers(*players, playerCount, in);
-    checkLanding(*players, playerCount, m);
+    checkLanding(*players, playerCount, m, out);
 
     // printPlayers(*players, playerCount);
     // printHeightmap(m);
@@ -56,12 +57,12 @@ void printPlayers(elf *players, unsigned int playerCount) {
     }
 }
 
-void checkLanding(elf *players, unsigned int playerCount, map *m) {
+void checkLanding(elf *players, unsigned int playerCount, map *m, FILE *out) {
     unsigned int i;
     for (i = 0; i < playerCount; i++) {
         // If he hasn't landed on the glacier
         if (!checkPosition(players + i, m)) {
-            printf("%s has missed the glacier.\n", (players + i)->name);
+            fprintf(out, "%s has missed the glacier.\n", (players + i)->name);
         }
     }
 }
