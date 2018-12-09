@@ -1,9 +1,9 @@
 #include "utils.h"
-#include "elves.h"
 #include <math.h>
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "elves.h"
 
 char isInRadius(elf *e, unsigned int r) {
     int x = e->x;
@@ -13,4 +13,3 @@ char isInRadius(elf *e, unsigned int r) {
 }
 
 unsigned char getBit(int x, int n) { return (x >> (8 * n)) & 0xFF; }
-

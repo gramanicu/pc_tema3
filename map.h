@@ -6,7 +6,6 @@ typedef struct mapStruct map;
 typedef struct cellStruct cell;
 typedef struct stormStruct snowstorm;
 
-
 /* snowstorm information
     - x, y - the coordinates of the "storm eye"
     - r - the radius of the storm
@@ -42,7 +41,7 @@ void printSnowstorm(snowstorm *s);
 // Set a map cell height
 void setCellHeight(map *m, int x, int y, unsigned int height);
 
-// Set the glove type in a cell 
+// Set the glove type in a cell
 void setCellGloves(map *m, int x, int y, char glove);
 
 // Set both the cell height and glove type
@@ -55,17 +54,20 @@ unsigned int getCellHeight(map *m, int x, int y);
 unsigned int getCellGlove(map *m, int x, int y);
 
 // Returns the map diameter (size of one side of the square)
-unsigned int getMapDiametre(map *m);
+unsigned int mapDiameter(map *m);
 
 // Returns the map area
-unsigned int getMapArea(map *m);
+unsigned int mapArea(map *m);
 
 // Allocates the memory for the map and sets the radius
 void prepareMap(map *m, unsigned int radius);
 
+// Deallocates the memory used by the map
+void releaseMap(map *m);
+
 // Generates the map, with a specified radius
 // taking required data from a FILE
-void generateMap(map *m,unsigned int radius, FILE *in);
+void generateMap(map *m, unsigned int radius, FILE *in);
 
 // Shows a map's heightmap - for development purposes
 void printHeightmap(map *m);

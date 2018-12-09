@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void createElf(elf *e, char *name, char x, char y, char hp, char stamina) {
+void createElf(elf *e, char *name, int x, int y, int hp, int stamina) {
     e->name = calloc(strlen(name), sizeof(char));
     strcpy(e->name, name);
     e->x = x;
@@ -13,6 +13,8 @@ void createElf(elf *e, char *name, char x, char y, char hp, char stamina) {
     e->dmg = 0;
 }
 
+void releaseElf(elf *e) { free(e->name); }
+
 void printElf(elf *e) {
     printf("Name : %s\n", e->name);
     printf("Position : (%d, %d)\n", e->x, e->y);
@@ -20,3 +22,7 @@ void printElf(elf *e) {
     printf("Stamina : %d\n", e->stamina);
     printf("DMG : %d\n", e->dmg);
 }
+
+void setGloves(elf *e, int gloves) { e->dmg = gloves; }
+
+unsigned int getGloves(elf *e) { return e->dmg; }

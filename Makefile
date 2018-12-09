@@ -19,6 +19,7 @@ AFLAGS = -FSr
 # compilarea programului
 build: $(obj)
 	$(CC) -o $(exe) $^ $(LFLAGS) $(CFLAGS)
+	rm -f *.o
 
 .PHONY:build
 # ruleaza programul
