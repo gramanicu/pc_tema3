@@ -18,6 +18,19 @@ void prepareGame(map *m, elf **players, unsigned int *count, FILE *in) {
     *count = playerCount;
 }
 
+void startGame(char *files) {
+    map m;
+    elf *players;
+    unsigned int playerCount;
+
+    FILE *in, *out;
+
+    prepareFiles(&in, &out, files);
+    prepareGame(&m, &players, &playerCount, in);
+    // Game
+    releaseMemory(&m, players, playerCount, in, out);
+}
+
 void spawnPlayers(elf *players, unsigned int playerCount, FILE *in) {
     unsigned int i, x, y, hp, stamina;
     char name[50];
@@ -38,7 +51,7 @@ void printPlayers(elf *players, unsigned int playerCount) {
     }
 }
 
-void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in) {
+void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in, FILE *out) {
     unsigned int i;
     releaseMap(m);
     for (i = 0; i < playerCount; i++) {
@@ -46,4 +59,5 @@ void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in) {
     }
     free(players);
     fclose(in);
+    fclose(out);
 }

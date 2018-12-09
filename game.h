@@ -11,12 +11,15 @@
 void prepareGame(map *m, elf **players, unsigned int *count, FILE *in);
 
 // Frees all dinamically allocated memory and closes the input file
-void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in);
+void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in, FILE *out);
 
 // Reads player information from the file and spawns the elves
 void spawnPlayers(elf *players, unsigned int playerCount, FILE *in);
 
 // Prints player information - development purposes
 void printPlayers(elf *players, unsigned int playerCount);
+
+// Here is all the game logic
+void startGame(char *files);
 
 #endif

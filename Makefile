@@ -24,7 +24,7 @@ build: $(OBJ)
 .PHONY:build
 # ruleaza programul
 run: build
-		./$(EXE)
+		./$(EXE) date
 .PHONY:run
 
 #arhiveaza tema
@@ -60,7 +60,7 @@ styleCheck:
 
 .PHONY:styleCheck
 
-MFLAGS = --leak-check=yes --leak-check=full --show-leak-kinds=all 
+MFLAGS = --leak-check=full --show-leak-kinds=all 
 memory:
-	valgrind $(MFLAGS) ./$(EXE)
+	valgrind $(MFLAGS) ./$(EXE) date
 .PHONY:memory
