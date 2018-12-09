@@ -8,10 +8,10 @@
     the map, players and player count, so we can deallocate the
     memory at the end of execution
 */
-void prepareGame(map *m, elf *players, unsigned int *count);
+void prepareGame(map *m, elf **players, unsigned int *count, FILE *in);
 
-// Frees all dinamically allocated memory
-void releaseMemory(map *m, elf *players, unsigned int playerCount);
+// Frees all dinamically allocated memory and closes the input file
+void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in);
 
 // Reads player information from the file and spawns the elves
 void spawnPlayers(elf *players, unsigned int playerCount, FILE *in);

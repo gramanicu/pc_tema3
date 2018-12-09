@@ -4,19 +4,17 @@
 #include <stdlib.h>
 
 // Reads the input to prepare the game
-void prepareGame(map *m, elf *players, unsigned int *count) {
-    FILE *in = fopen("date.in", "rt");
+void prepareGame(map *m, elf **players, unsigned int *count, FILE *in) {
     unsigned int radius, playerCount;
 
     fscanf(in, "%ud", &radius);
     fscanf(in, "%ud", &playerCount);
 
     generateMap(m, radius, in);
-    players = calloc(playerCount, sizeof(elf));
-    spawnPlayers(players, playerCount, in);
-    // printPlayers(players, playerCount);
-    // printHeightmap(m);
-
+    *players = calloc(playerCount, sizeof(elf));
+    spawnPlayers(*players, playerCount, in);
+    printPlayers(*players, playerCount);
+    printHeightmap(m);
     *count = playerCount;
 }
 
@@ -40,12 +38,12 @@ void printPlayers(elf *players, unsigned int playerCount) {
     }
 }
 
-void releaseMemory(map *m, elf *players, unsigned int playerCount) {
+void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in) {
     unsigned int i;
     releaseMap(m);
-    // printPlayers(players, playerCount);
     for (i = 0; i < playerCount; i++) {
-        // releaseElf(players+i);
+        releaseElf(players + i);
     }
-    // free(players);
+    free(players);
+    fclose(in);
 }

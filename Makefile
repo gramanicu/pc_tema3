@@ -3,9 +3,9 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic -std=c99 -O3 -Wno-unused-result
 LFLAGS = -lm
-exe = snowfight
-src = $(wildcard *.c)
-obj = $(src:.c=.o)
+EXE = snowfight
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
 
 # arhiva checker
 CHECKER = https://ocw.cs.pub.ro/courses/_media/programare/teme_2018/check_gigel.zip
@@ -17,14 +17,14 @@ ACONTENTS = README Makefile *.c *.h
 AFLAGS = -FSr 
 
 # compilarea programului
-build: $(obj)
-	$(CC) -o $(exe) $^ $(LFLAGS) $(CFLAGS)
+build: $(OBJ)
+	$(CC) -o $(EXE) $^ $(LFLAGS) $(CFLAGS)
 	rm -f *.o
 
 .PHONY:build
 # ruleaza programul
 run: build
-		./$(exe)
+		./$(EXE)
 .PHONY:run
 
 #arhiveaza tema
@@ -35,7 +35,7 @@ pack:
 
 # sterge executabilul
 clean:
-	rm -f $(exe) $(obj)
+	rm -f $(EXE) $(OBJ)
 
 .PHONY:clean
 
@@ -58,4 +58,9 @@ update:
 styleCheck: 
 	-python cs.py $(SOURCE)
 
-.PHONY: styleCheck
+.PHONY:styleCheck
+
+MFLAGS = --leak-check=yes --leak-check=full --show-leak-kinds=all 
+memory:
+	valgrind $(MFLAGS) ./$(EXE)
+.PHONY:memory

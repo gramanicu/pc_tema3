@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 void createElf(elf *e, char *name, int x, int y, int hp, int stamina) {
-    e->name = calloc(strlen(name), sizeof(char));
+    e->name = calloc(strlen(name) + 1, sizeof(char));
     strcpy(e->name, name);
     e->x = x;
     e->y = y;
