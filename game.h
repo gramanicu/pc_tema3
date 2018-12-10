@@ -24,11 +24,14 @@ void printPlayers(elf *players, unsigned int playerCount);
 // Check if any player has missed the glacier
 void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out);
 
-// Sends an elf back to santa and modifies the total number of players
-void eliminateElf(elf *players, unsigned int id, unsigned int *count);
+// Sets the elf health to 0
+void eliminateElf(elf *players, unsigned int id);
 
-// Checks if the game is over, says who won and closes the program
-void checkFinished(elf *players, unsigned int playerCount, FILE *out);
+/*  Checks if the game is over, says who won and returns 1
+    It would have been possible to use exit(0) instead of a return,
+    but we need to dealocate the memory before exit.
+*/
+int checkFinished(elf *players, unsigned int playerCount, FILE *out);
 
 // Check if the elf has fallen off the glacier
 char isOut(elf *players, unsigned int id, map *m);
@@ -44,13 +47,20 @@ void startGame(char *files);
 // Starts the battle between the elves (reads commands and elves moves)
 void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out);
 
+// Starts a storm at the specified position and damages all players in radius
+void startStorm(snowstorm *s, elf *players, unsigned int playerCount,
+                FILE *out);
+
 // Moves the elf to a position, check is he has fallen, takes gloves and attacks
-// (if required)
-void movePlayer(elf *players, map *m, unsigned int id,
-                unsigned int *playerCount, char move, FILE *out);
+// (if required). Will return 1 if the game is finished
+int movePlayer(elf *players, map *m, unsigned int id, unsigned int *playerCount,
+               char move, FILE *out);
 
 // Starts the fight between two elves. If the one who got second into the
 // cell won, the function returns 1. Else, it returns 0
 int fight(elf *att, elf *def);
+
+// Prints the leaderboard, sorted using the asked criteria
+void printLeaderboard(elf *players, unsigned int count, FILE *out);
 
 #endif

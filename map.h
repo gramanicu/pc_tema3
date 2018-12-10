@@ -49,8 +49,8 @@ void setCellGloves(map *m, int x, int y, unsigned int glove);
 // Set both the cell height and glove type
 void setCell(map *m, int x, int y, unsigned int height, unsigned intglove);
 
-// Returns a cell height
-unsigned int getCellHeight(map *m, int x, int y);
+// Returns a cell height or -1 (if the location is out)
+int getCellHeight(map *m, int x, int y);
 
 // Returns a cell glove type
 unsigned int getCellGloves(map *m, int x, int y);

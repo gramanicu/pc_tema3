@@ -31,7 +31,11 @@ void setCell(map *m, int x, int y, unsigned int height, unsigned int glove) {
     setCellHeight(m, x, y, height);
 }
 
-unsigned int getCellHeight(map *m, int x, int y) {
+int getCellHeight(map *m, int x, int y) {
+    if ((unsigned int)x >= m->diameter || (unsigned int)y >= m->diameter ||
+        x < 0 || y < 0) {
+        return -1;
+    }
     return m->cells[y * mapDiameter(m) + x].height;
 }
 

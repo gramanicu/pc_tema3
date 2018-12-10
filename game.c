@@ -1,4 +1,5 @@
 #include "game.h"
+#include <math.h>
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +9,7 @@
 
 // I supposed an elf can't move more than 100 times at a time
 #define MAX_DIRECTIONS 100
+#define MAX_NAME_LENGTH 30
 
 void startGame(char *files) {
     map m;
@@ -18,32 +20,108 @@ void startGame(char *files) {
 
     prepareFiles(&in, &out, files);
     prepareGame(&m, &players, &playerCount, in, out);
-
     battle(&m, &players, &playerCount, in, out);
 
+    // printPlayers(players, playerCount);
+    // printHeightmap(&m);
     releaseMemory(&m, players, playerCount, in, out);
+}
+
+void printLeaderboard(elf *players, unsigned int count, FILE *out) {
+    int status[count], eliminated[count], id[count], ok = 1, aux;
+    unsigned int i;
+    for (i = 0; i < count; i++) {
+        id[i] = i;
+        eliminated[i] = (players + i)->won;
+        status[i] = ((players + i)->hp != 0 ? 1 : 0);
+    }
+
+    while (ok) {
+        ok = 0;
+        for (i = 0; i < count - 1; i++) {
+            if (status[i] > status[i + 1]) {
+                aux = id[i];
+                id[i] = id[i + 1];
+                id[i + 1] = aux;
+                aux = eliminated[i];
+                eliminated[i] = eliminated[i + 1];
+                eliminated[i + 1] = aux;
+                aux = status[i];
+                status[i] = status[i + 1];
+                status[i + 1] = aux;
+                ok = 1;
+            } else if (status[i] == status[i + 1]) {
+                if (eliminated[i] < eliminated[i + 1]) {
+                    aux = id[i];
+                    id[i] = id[i + 1];
+                    id[i + 1] = aux;
+                    aux = eliminated[i];
+                    eliminated[i] = eliminated[i + 1];
+                    eliminated[i + 1] = aux;
+                    aux = status[i];
+                    status[i] = status[i + 1];
+                    status[i + 1] = aux;
+                    ok = 1;
+                } else if (eliminated[i] == eliminated[i + 1]) {
+                    char curr[MAX_NAME_LENGTH], next[MAX_NAME_LENGTH];
+                    strcpy(curr, (players + id[i])->name);
+                    strcpy(next, (players + id[i + 1])->name);
+                    if (strcmp(curr, next) > 0) {
+                        aux = id[i];
+                        id[i] = id[i + 1];
+                        id[i + 1] = aux;
+                        aux = eliminated[i];
+                        eliminated[i] = eliminated[i + 1];
+                        eliminated[i + 1] = aux;
+                        aux = status[i];
+                        status[i] = status[i + 1];
+                        status[i + 1] = aux;
+                        ok = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    fprintf(out, "SCOREBOARD:\n");
+    for (i = 0; i < count; i++) {
+        if (status[i]) {
+            fprintf(out, "%s \t %s \t %d\n", (players + id[i])->name, "DRY",
+                    eliminated[i]);
+        } else {
+            fprintf(out, "%s \t %s \t %d\n", (players + id[i])->name, "WET",
+                    eliminated[i]);
+        }
+    }
 }
 
 void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out) {
     char command[20];
-    while (fscanf(in, "%s", command) != EOF) {
-        if (strcmp(command, "MOVE")) {
-            unsigned int id = 0, i;
-            char directions[MAX_DIRECTIONS];
+    unsigned int id = 0, i, stamina;
+    int k;
+    char directions[MAX_DIRECTIONS];
 
+    while (fscanf(in, "%s", command) != EOF) {
+        if (strcmp(command, "MOVE") == 0) {
+            id = 0;
             fscanf(in, "%ud", &id);
             fscanf(in, "%s", directions);
-
             for (i = 0; i < strlen(directions); i++) {
-                // printf("%d %c\n", id, directions[i]);
-                // movePlayer(players, m, id, &count, directions[i], out);
+                if (movePlayer(*players, m, id, count, directions[i], out)) {
+                    return;
+                }
             }
-        } else if (strcmp(command, "SNOWSTORM")) {
-            int k;
+        } else if (strcmp(command, "SNOWSTORM") == 0) {
             fscanf(in, "%d", &k);
-        } else if (strcmp(command, "PRINT_SCOREBOARD")) {
-        } else if (strcmp(command, "MELTDOWN")) {
-            unsigned int stamina;
+            snowstorm *storm = malloc(sizeof(snowstorm));
+            parseSnowstorm(k, storm);
+
+            startStorm(storm, *players, *count, out);
+
+            free(storm);
+        } else if (strcmp(command, "PRINT_SCOREBOARD") == 0) {
+            printLeaderboard(*players, *count, out);
+        } else if (strcmp(command, "MELTDOWN") == 0) {
             fscanf(in, "%ud", &stamina);
         }
     }
@@ -63,9 +141,6 @@ void prepareGame(map *m, elf **players, unsigned int *count, FILE *in,
     checkLanding(*players, &playerCount, m, out);
 
     *count = playerCount;
-
-    // printPlayers(*players, playerCount);
-    // printHeightmap(m);
 }
 
 void spawnPlayers(elf *players, unsigned int playerCount, FILE *in) {
@@ -94,7 +169,7 @@ void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out) {
         // If he hasn't landed on the glacier
         if (!checkPosition(players + i, m)) {
             fprintf(out, "%s has missed the glacier.\n", (players + i)->name);
-            eliminateElf(players, i, playerCount);
+            eliminateElf(players, i);
 
             /*  Check if the game is finished (the funny situation when
                 all players except the last one to land have missed the
@@ -105,16 +180,9 @@ void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out) {
     }
 }
 
-void eliminateElf(elf *players, unsigned int id, unsigned int *count) {
-    unsigned int i;
-    for (i = id; i < *count - 1; i++) {
-        elf *aux = (players + i + 1);
-        releaseElf(players + i);
-        createElf(players + i, aux->name, aux->x, aux->y, aux->hp,
-                  aux->stamina);
-    }
-    releaseElf(players + *count - 1);
-    *count = *count - 1;
+void eliminateElf(elf *players, unsigned int id) {
+    // changed eliminate function because of a problem specification
+    (players + id)->hp = 0;
 }
 
 void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
@@ -129,76 +197,113 @@ void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
     fclose(out);
 }
 
-void checkFinished(elf *players, unsigned int playerCount, FILE *out) {
-    if (playerCount == 1) {
-        fprintf(out, "%s has won!\n", players->name);
-        exit(0);
+int checkFinished(elf *players, unsigned int playerCount, FILE *out) {
+    int alive = 0;
+    unsigned int i;
+    for (i = 0; i < playerCount; i++) {
+        if ((players + i)->hp > 0) {
+            alive++;
+        }
+    }
+    if (alive == 1) {
+        fprintf(out, "%s has won!\n", (players + i)->name);
+        return 1;
+    } else {
+        return 0;
     }
 }
 
-void movePlayer(elf *players, map *m, unsigned int id,
-                unsigned int *playerCount, char move, FILE *out) {
-    unsigned int x, y;
+// Will return 1 if the game is over
+int movePlayer(elf *players, map *m, unsigned int id, unsigned int *playerCount,
+               char move, FILE *out) {
+    unsigned int x, y, fallen = 0;
+    int height;
     getPosition(players + id, &x, &y);
     switch (move) {
         // Will do the move only if he has enough stamina
         case 'U':
-            if (getStamina(players + id) <= getCellHeight(m, x - 1, y)) {
-                setPosition(players + id, x - 1, y);
+            height = getCellHeight(m, x - 1, y);
+            if (height != -1) {
+                if (getStamina(players + id) <= (unsigned int)height) {
+                    setPosition(players + id, x - 1, y);
+                }
+            } else {
+                fallen = 1;
             }
             break;
         case 'D':
-            if (getStamina(players + id) <= getCellHeight(m, x + 1, y)) {
-                setPosition(players + id, x + 1, y);
+            height = getCellHeight(m, x + 1, y);
+            if (height != -1) {
+                if (getStamina(players + id) <= (unsigned int)height) {
+                    setPosition(players + id, x + 1, y);
+                }
+            } else {
+                fallen = 1;
             }
             break;
         case 'R':
-            if (getStamina(players + id) <= getCellHeight(m, x, y + 1)) {
-                setPosition(players + id, x, y + 1);
+            height = getCellHeight(m, x, y + 1);
+            if (height != -1) {
+                if (getStamina(players + id) <= (unsigned int)height) {
+                    setPosition(players + id, x, y + 1);
+                }
+            } else {
+                fallen = 1;
             }
             break;
         case 'L':
-            if (getStamina(players + id) <= getCellHeight(m, x, y - 1)) {
-                setPosition(players + id, x, y - 1);
+            height = getCellHeight(m, x, y - 1);
+            if (height != -1) {
+                if (getStamina(players + id) <= (unsigned int)height) {
+                    setPosition(players + id, x, y - 1);
+                }
+            } else {
+                fallen = 1;
             }
             break;
 
-            // Consumes the stamina required to climb the hill
-            unsigned int ax, ay;
-            getPosition(players + id, &ax, &ay);
-            unsigned int loss;
-            loss = getCellHeight(m, x, y) - getCellHeight(m, ax, ay);
-            setStamina(players + id, loss);
+            // Verifies if he fell out of the map
+            if (!fallen) {
+                // Consumes the stamina required to climb the hill
+                unsigned int ax, ay;
+                getPosition(players + id, &ax, &ay);
+                unsigned int loss;
+                loss = getCellHeight(m, x, y) - getCellHeight(m, ax, ay);
+                setStamina(players + id, loss);
+            }
     }
 
-    if (isOut(players, id, m)) {
+    if (isOut(players, id, m) || fallen) {
         fprintf(out, "%s fell of the glacier.\n", (players + id)->name);
-        eliminateElf(players, id, playerCount);
-        checkFinished(players, *playerCount, out);
+        eliminateElf(players, id);
+        return checkFinished(players, *playerCount, out);
     } else {
         takeGloves(players + id, m);
-
         // Finds the id of the player at the specified position
         int defID = playerAtPosition(players, id, *playerCount,
                                      (players + id)->x, (players + id)->y);
-
         // Checks if there is a player there
         if (defID != -1) {
             if (fight(players + id, players + defID)) {
                 // he won the fight
                 fprintf(out, "%s sent %s back home.\n", (players + id)->name,
                         (players + defID)->name);
-                eliminateElf(players, defID, playerCount);
-                checkFinished(players, *playerCount, out);
+                (players + id)->stamina = (players + defID)->stamina;
+                (players + id)->won = (players + id)->won + 1;
+                eliminateElf(players, defID);
+                return checkFinished(players, *playerCount, out);
             } else {
                 // he lost the fight
                 fprintf(out, "%s sent %s back home.\n", (players + defID)->name,
                         (players + id)->name);
-                eliminateElf(players, id, playerCount);
-                checkFinished(players, *playerCount, out);
+                (players + defID)->stamina = (players + id)->stamina;
+                (players + defID)->won = (players + defID)->won + 1;
+                eliminateElf(players, id);
+                return checkFinished(players, *playerCount, out);
             }
         }
     }
+    return 0;
 }
 
 int fight(elf *att, elf *def) {
@@ -251,4 +356,25 @@ int playerAtPosition(elf *players, unsigned int exeption,
         }
     }
     return -1;
+}
+
+void startStorm(snowstorm *s, elf *players, unsigned int playerCount,
+                FILE *out) {
+    unsigned int i;
+    for (i = 0; i < playerCount; i++) {
+        unsigned int x = (players + i)->x;
+        unsigned int y = (players + i)->y;
+        double lenght = sqrt((x - s->x) * (x - s->x) + (y - s->y) * (y - s->y));
+        if (lenght <= s->r) {
+            if ((players + i)->hp != 0) {
+                takesDamage(players + i, s->dmg);
+                if ((players + i)->hp == 0) {
+                    fprintf(out, "%s was hit by snowstorm.\n",
+                            (players + i)->name);
+                    eliminateElf(players, i);
+                    checkFinished(players, playerCount, out);
+                }
+            }
+        }
+    }
 }
