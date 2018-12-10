@@ -7,7 +7,6 @@ This is my solution for [the third homework](https://ocw.cs.pub.ro/courses/progr
 # TO-DO
 - Implement death function for elves
 - Finish move function
-- IMPORTANT - save elves in map - so we can find more efficiently if and who is at a position
 ... More ...
 
 ---
