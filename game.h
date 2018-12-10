@@ -32,9 +32,18 @@ void eliminateElf(elf *players, unsigned int id, unsigned int *count,
 void checkFinished(elf *players, unsigned int playerCount, FILE *out);
 
 // Check if the elf has fallen off the glacier
-char isOut(elf *players, unsigned int id ,map *m);
+char isOut(elf *players, unsigned int id, map *m);
+
+// Check if there is another elf at the specified position (exeption is the id
+// of the current elf
+int playerAtPosition(elf *players, unsigned int exeption,
+                     unsigned int playerCount, unsigned int x, unsigned int y);
 
 // Here is all the game logic
 void startGame(char *files);
+
+// Starts the fight between two elves. If the one who got second into the cell
+// won, the function returns 1. Else, it returns 0
+int fight(elf *att, elf *def)
 
 #endif

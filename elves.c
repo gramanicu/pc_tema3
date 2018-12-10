@@ -46,6 +46,14 @@ void takeGloves(elf *e, map *m) {
     }
 }
 
+void takesDamage(elf *e, unsigned int dmg) {
+    if (dmg > e->hp) {
+        e - hp = 0;
+    } else {
+        e->hp = e->hp - dmg;
+    }
+}
+
 void setPosition(elf *e, unsigned int x, unsigned int y) {
     e->x = x;
     e->y = y;

@@ -43,4 +43,7 @@ void setPosition(elf *e, unsigned int x, unsigned int y);
 // The elf will change gloves (if he needs)
 void takeGloves(elf *e, map *m);
 
+// Damage the specified elf for "dmg" damage
+void takesDamage(elf *e, unsigned int dmg);
+
 #endif

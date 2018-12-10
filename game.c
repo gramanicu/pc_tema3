@@ -102,37 +102,89 @@ void checkFinished(elf *players, unsigned int playerCount, FILE *out) {
     }
 }
 
-int movePlayer(elf *players,map *m, unsigned int id, char move, FILE *out) {
+int movePlayer(elf *players, map *m, unsigned int id, unsigned int playerCount,
+               char move, FILE *out) {
     unsigned int x, y;
     getPosition(players + id, &x, &y);
     switch (move) {
         case 'U':
-            setPosition(players + id, x-1, y);
+            setPosition(players + id, x - 1, y);
             break;
         case 'D':
-            setPosition(players + id, x+1, y);
+            setPosition(players + id, x + 1, y);
             break;
         case 'R':
-            setPosition(players + id, x, y+1);
+            setPosition(players + id, x, y + 1);
             break;
         case 'L':
-            setPosition(players + id, x, y-1);
+            setPosition(players + id, x, y - 1);
             break;
     }
-    if(isOut(players, id, m)) {
+    if (isOut(players, id, m)) {
         return 0;
-        fprintf(out, "%s fell of the glacier.\n", (players+id)->name);
-    
+        fprintf(out, "%s fell of the glacier.\n", (players + id)->name);
+
     } else {
-        takeGloves(players+id, m);
-        //check enemy - ok = 0 if killed
+        takeGloves(players + id, m);
+        int defID = playerAtPosition(players, playerCount, (players + id)->x,
+                                     (players + id)->y);
+        if (defID != -1) {
+            if (fight(players + id, players + defID)) {
+                // he won
+            }
+        }
     }
     return 1;
 }
 
-char isOut(elf *players, unsigned int id ,map *m) {
+int fight(elf *att, elf *def) {
+    int turn;
+
+    /*  if the one who got second in the specified cell has more or equal
+       stamina, he attacks first
+    */
+    if (att->stamina >= def->stamina) {
+        turn = 1;
+    } else {
+        turn = 0;
+    }
+
+    // elves attack each other untill someone is "Soaked"
+    while (1) {
+        if (turn) {
+            takesDamage(def, att->dmg);
+            if (!def->hp) {
+                return 1;
+            }
+            turn = 0;
+        } else {
+            takesDamage(att, def->dmg);
+            if (!att->hp) {
+                return 0;
+            }
+            turn = 1;
+        }
+    }
+}
+
+char isOut(elf *players, unsigned int id, map *m) {
     if (!checkPosition(players + id, m)) {
         return 1;
     }
     return 0;
+}
+
+int playerAtPosition(elf *players, unsigned int exeption,
+                     unsigned int playerCount, unsigned int x, unsigned int y) {
+    unsigned int i;
+    for (i = 0; i < playerCount; i++) {
+        if (i != exeption) {
+            unsigned int ex, ey;
+            getPosition(players + i, &ex, &ey);
+            if (ex == x && ey == y) {
+                return i;
+            }
+        }
+    }
+    return -1;
 }
