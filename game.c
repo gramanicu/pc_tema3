@@ -2,8 +2,12 @@
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "elves.h"
 #include "map.h"
+
+// I supposed an elf can't move more than 100 times at a time
+#define MAX_DIRECTIONS 100
 
 void startGame(char *files) {
     map m;
@@ -14,8 +18,35 @@ void startGame(char *files) {
 
     prepareFiles(&in, &out, files);
     prepareGame(&m, &players, &playerCount, in, out);
-    // Game
+
+    battle(&m, &players, &playerCount, in, out);
+
     releaseMemory(&m, players, playerCount, in, out);
+}
+
+void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out) {
+    char command[20];
+    while (fscanf(in, "%s", command) != EOF) {
+        if (strcmp(command, "MOVE")) {
+            unsigned int id = 0, i;
+            char directions[MAX_DIRECTIONS];
+
+            fscanf(in, "%ud", &id);
+            fscanf(in, "%s", directions);
+
+            for (i = 0; i < strlen(directions); i++) {
+                // printf("%d %c\n", id, directions[i]);
+                // movePlayer(players, m, id, &count, directions[i], out);
+            }
+        } else if (strcmp(command, "SNOWSTORM")) {
+            int k;
+            fscanf(in, "%d", &k);
+        } else if (strcmp(command, "PRINT_SCOREBOARD")) {
+        } else if (strcmp(command, "MELTDOWN")) {
+            unsigned int stamina;
+            fscanf(in, "%ud", &stamina);
+        }
+    }
 }
 
 // Reads the input to prepare the game
@@ -63,13 +94,18 @@ void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out) {
         // If he hasn't landed on the glacier
         if (!checkPosition(players + i, m)) {
             fprintf(out, "%s has missed the glacier.\n", (players + i)->name);
-            eliminateElf(players, i, playerCount, out);
+            eliminateElf(players, i, playerCount);
+
+            /*  Check if the game is finished (the funny situation when
+                all players except the last one to land have missed the
+                glacier - he could have missed it too, still winner :)
+            */
+            checkFinished(players, *playerCount, out);
         }
     }
 }
 
-void eliminateElf(elf *players, unsigned int id, unsigned int *count,
-                  FILE *out) {
+void eliminateElf(elf *players, unsigned int id, unsigned int *count) {
     unsigned int i;
     for (i = id; i < *count - 1; i++) {
         elf *aux = (players + i + 1);
@@ -79,8 +115,6 @@ void eliminateElf(elf *players, unsigned int id, unsigned int *count,
     }
     releaseElf(players + *count - 1);
     *count = *count - 1;
-
-    checkFinished(players, *count, out);
 }
 
 void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
@@ -102,39 +136,69 @@ void checkFinished(elf *players, unsigned int playerCount, FILE *out) {
     }
 }
 
-int movePlayer(elf *players, map *m, unsigned int id, unsigned int playerCount,
-               char move, FILE *out) {
+void movePlayer(elf *players, map *m, unsigned int id,
+                unsigned int *playerCount, char move, FILE *out) {
     unsigned int x, y;
     getPosition(players + id, &x, &y);
     switch (move) {
+        // Will do the move only if he has enough stamina
         case 'U':
-            setPosition(players + id, x - 1, y);
+            if (getStamina(players + id) <= getCellHeight(m, x - 1, y)) {
+                setPosition(players + id, x - 1, y);
+            }
             break;
         case 'D':
-            setPosition(players + id, x + 1, y);
+            if (getStamina(players + id) <= getCellHeight(m, x + 1, y)) {
+                setPosition(players + id, x + 1, y);
+            }
             break;
         case 'R':
-            setPosition(players + id, x, y + 1);
+            if (getStamina(players + id) <= getCellHeight(m, x, y + 1)) {
+                setPosition(players + id, x, y + 1);
+            }
             break;
         case 'L':
-            setPosition(players + id, x, y - 1);
+            if (getStamina(players + id) <= getCellHeight(m, x, y - 1)) {
+                setPosition(players + id, x, y - 1);
+            }
             break;
-    }
-    if (isOut(players, id, m)) {
-        return 0;
-        fprintf(out, "%s fell of the glacier.\n", (players + id)->name);
 
+            // Consumes the stamina required to climb the hill
+            unsigned int ax, ay;
+            getPosition(players + id, &ax, &ay);
+            unsigned int loss;
+            loss = getCellHeight(m, x, y) - getCellHeight(m, ax, ay);
+            setStamina(players + id, loss);
+    }
+
+    if (isOut(players, id, m)) {
+        fprintf(out, "%s fell of the glacier.\n", (players + id)->name);
+        eliminateElf(players, id, playerCount);
+        checkFinished(players, *playerCount, out);
     } else {
         takeGloves(players + id, m);
-        int defID = playerAtPosition(players, playerCount, (players + id)->x,
-                                     (players + id)->y);
+
+        // Finds the id of the player at the specified position
+        int defID = playerAtPosition(players, id, *playerCount,
+                                     (players + id)->x, (players + id)->y);
+
+        // Checks if there is a player there
         if (defID != -1) {
             if (fight(players + id, players + defID)) {
-                // he won
+                // he won the fight
+                fprintf(out, "%s sent %s back home.\n", (players + id)->name,
+                        (players + defID)->name);
+                eliminateElf(players, defID, playerCount);
+                checkFinished(players, *playerCount, out);
+            } else {
+                // he lost the fight
+                fprintf(out, "%s sent %s back home.\n", (players + defID)->name,
+                        (players + id)->name);
+                eliminateElf(players, id, playerCount);
+                checkFinished(players, *playerCount, out);
             }
         }
     }
-    return 1;
 }
 
 int fight(elf *att, elf *def) {

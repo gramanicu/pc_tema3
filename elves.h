@@ -10,9 +10,11 @@ typedef struct elfStruct elf;
     - stamina : movement points
     - dmg : how much damage can he do
           ( what type of gloves does he have )
+    - won : how many fights he has won
+    - name : his name
 */
 struct elfStruct {
-    unsigned int x, y, hp, stamina, dmg;
+    unsigned int x, y, hp, stamina, dmg, won;
     char *name;
 };
 
@@ -27,6 +29,12 @@ void setGloves(elf *e, int gloves);
 
 // Returns the type of gloves the elf has
 unsigned int getGloves(elf *e);
+
+// Sets the elf's stamina
+void setStamina(elf *e, int stamina);
+
+// Returns the stamina the elf has
+unsigned int getStamina(elf *e);
 
 // Show an elf information - for development purposes
 void printElf(elf *e);

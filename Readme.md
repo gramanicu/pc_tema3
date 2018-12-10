@@ -4,11 +4,10 @@ This is my solution for [the third homework](https://ocw.cs.pub.ro/courses/progr
 
 # Solution
 
-# TO-DO
-- Implement death function for elves
-- Finish move function
-... More ...
-
----
+## COMMANDS 
+- MOVE <id> <moves>
+- SNOWSTORM <K> 
+- PRINT_SCOREBOARD
+- MELTDOWN
 
 © 2018 Grama Nicolae

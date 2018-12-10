@@ -25,8 +25,7 @@ void printPlayers(elf *players, unsigned int playerCount);
 void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out);
 
 // Sends an elf back to santa and modifies the total number of players
-void eliminateElf(elf *players, unsigned int id, unsigned int *count,
-                  FILE *out);
+void eliminateElf(elf *players, unsigned int id, unsigned int *count);
 
 // Checks if the game is over, says who won and closes the program
 void checkFinished(elf *players, unsigned int playerCount, FILE *out);
@@ -42,8 +41,16 @@ int playerAtPosition(elf *players, unsigned int exeption,
 // Here is all the game logic
 void startGame(char *files);
 
-// Starts the fight between two elves. If the one who got second into the cell
-// won, the function returns 1. Else, it returns 0
-int fight(elf *att, elf *def)
+// Starts the battle between the elves (reads commands and elves moves)
+void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out);
+
+// Moves the elf to a position, check is he has fallen, takes gloves and attacks
+// (if required)
+void movePlayer(elf *players, map *m, unsigned int id,
+                unsigned int *playerCount, char move, FILE *out);
+
+// Starts the fight between two elves. If the one who got second into the
+// cell won, the function returns 1. Else, it returns 0
+int fight(elf *att, elf *def);
 
 #endif
