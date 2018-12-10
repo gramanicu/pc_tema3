@@ -102,7 +102,7 @@ void checkFinished(elf *players, unsigned int playerCount, FILE *out) {
     }
 }
 
-int movePlayer(elf *players, unsigned int id, char move) {
+int movePlayer(elf *players,map *m, unsigned int id, char move, FILE *out) {
     unsigned int x, y;
     getPosition(players + id, &x, &y);
     switch (move) {
@@ -131,7 +131,6 @@ int movePlayer(elf *players, unsigned int id, char move) {
 }
 
 char isOut(elf *players, unsigned int id ,map *m) {
-    unsigned int i;
     if (!checkPosition(players + id, m)) {
         return 1;
     }
