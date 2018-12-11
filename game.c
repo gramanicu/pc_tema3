@@ -101,7 +101,9 @@ void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out) {
                 if (cont == 1) {
                     return;
                 } else if (cont == -1) {
-                    break;
+                    if(checkFinished(*players, *count, out)) {
+                        break;
+                    }
                 }
             }
         } else if (strcmp(command, "SNOWSTORM") == 0) {
@@ -118,7 +120,7 @@ void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out) {
             printLeaderboard(*players, *count, out);
         } else if (strcmp(command, "MELTDOWN") == 0) {
             fscanf(in, "%ud", &stamina);
-            if (meltdown(&m, *players, stamina, *count, out)) {
+            if (meltdown(m, *players, stamina, *count, out)) {
                 return;
             }
         }
@@ -157,8 +159,10 @@ void spawnPlayers(elf *players, unsigned int playerCount, FILE *in) {
 void printPlayers(elf *players, unsigned int playerCount) {
     unsigned int i;
     for (i = 0; i < playerCount; i++) {
+        printf("\n");
         printElf(players + i);
     }
+    printf("\n");
 }
 
 // Return 1 if game ended
@@ -174,7 +178,7 @@ int checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out) {
                 all players except the last one to land have missed the
                 glacier - he could have missed it too, still winner :)
             */
-            if(checkFinished(players, *playerCount, out)){
+            if (checkFinished(players, *playerCount, out)) {
                 return 1;
             }
         } else {
@@ -203,14 +207,15 @@ void releaseMemory(map *m, elf *players, unsigned int playerCount, FILE *in,
 
 int checkFinished(elf *players, unsigned int playerCount, FILE *out) {
     int alive = 0;
-    unsigned int i;
+    unsigned int i, id;
     for (i = 0; i < playerCount; i++) {
         if ((players + i)->hp > 0) {
             alive++;
+            id = i;
         }
     }
     if (alive == 1) {
-        fprintf(out, "%s has won!\n", (players + i)->name);
+        fprintf(out, "%s has won!\n", (players + id)->name);
         return 1;
     } else {
         return 0;
@@ -220,6 +225,7 @@ int checkFinished(elf *players, unsigned int playerCount, FILE *out) {
 // Will return 1 if the game is over and -1 if the elf was "soaked"
 int movePlayer(elf *players, map *m, unsigned int id, unsigned int *playerCount,
                char move, FILE *out) {
+    if ((players + id)->hp == 0) return -1;
     unsigned int x, y, fallen = 0;
     int height;
     getPosition(players + id, &x, &y);
@@ -328,13 +334,13 @@ int fight(elf *att, elf *def) {
     while (1) {
         if (turn) {
             takesDamage(def, att->dmg);
-            if (!def->hp) {
+            if (def->hp == 0) {
                 return 1;
             }
             turn = 0;
         } else {
             takesDamage(att, def->dmg);
-            if (!att->hp) {
+            if (att->hp == 0) {
                 return 0;
             }
             turn = 1;
@@ -365,28 +371,13 @@ int playerAtPosition(elf *players, unsigned int exeption,
 }
 
 // Return 1 if game ended
-int meltdown(map **m, elf *players, unsigned int staminaBonus,
+int meltdown(map *m, elf *players, unsigned int staminaBonus,
              unsigned int playerCount, FILE *out) {
-
-    
-
-
-    /*  Discarding this block of code - there is no need to
-        reallocate the map
-
-    map *next = malloc(sizeof(map));
-    prepareMap(next, (*m)->radius);
-    unsigned int i, j;
-    for (i = 1; i < next->diameter; i++) {
-        for (j = 1; j < next->diameter; j++) {
-            setCellHeight(next, i, j, getCellHeight(*m, i, j));
-            setCellGloves(next, i, j, getCellGloves(*m, i, j));
-        }
-    }
-
+    unsigned int i;
+    m->radius = m->radius - 1;
+    m->diameter = 2 * m->diameter + 1;
     for (i = 0; i < playerCount; i++) {
-        if ((players + i)->x == 0 || (players + i)->x == (*m)->diameter - 1 ||
-            (players + i)->y == 0 || (players + i)->y == (*m)->diameter - 1) {
+        if (!checkPosition(players + i, m)) {
             if ((players + i)->hp != 0) {
                 fprintf(out, "%s got wet because of global warming.\n",
                         (players + i)->name);
@@ -396,23 +387,9 @@ int meltdown(map **m, elf *players, unsigned int staminaBonus,
                 }
             }
         } else {
-            if (!checkPosition(players + i, *m)) {
-            fprintf(out, "%s got wet because of global warming.\n",
-                        (players + i)->name);
-            eliminateElf(players, i);
-
-            if(checkFinished(players, playerCount, out)) {
-                return 1;
-            }
-        }
             setStamina(players + i, getStamina(players + i) + staminaBonus);
         }
     }
-
-    releaseMap(*m);
-    free(*m);
-    *m = next;
-    */
 
     return 0;
 }

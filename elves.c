@@ -18,7 +18,9 @@ void createElf(elf *e, char *name, int x, int y, int hp, int stamina) {
 
 void releaseElf(elf *e) { free(e->name); }
 
-int checkPosition(elf *e, map *m) { return isInRadius(e, m->radius); }
+int checkPosition(elf *e, map *m) {
+    return isInRadius(e, m->center, m->radius);
+}
 
 void printElf(elf *e) {
     printf("Name : %s\n", e->name);

@@ -47,6 +47,7 @@ void prepareMap(map *m, unsigned int radius) {
     m->cells = calloc(pow(2 * radius + 1, 2), sizeof(cell));
     m->diameter = 2 * radius + 1;
     m->radius = radius;
+    m->center = radius;
 }
 
 void releaseMap(map *m) { free(m->cells); }

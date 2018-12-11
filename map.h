@@ -27,11 +27,13 @@ struct cellStruct {
     - cell - a 2D array with the "topographic" and loot information
     - radius - radius of the map
     - diameter - how long each side of the map is
+    - center - the map center (the x and y are equal)
 */
 struct mapStruct {
     struct cellStruct *cells;
     unsigned int diameter;
     unsigned int radius;
+    unsigned int center;
 };
 
 // Parse number k to the snowstorm structure

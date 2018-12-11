@@ -53,7 +53,7 @@ int startStorm(snowstorm *s, elf *players, unsigned int playerCount, FILE *out);
 
 // Makes the glacier a little smaller, and gives a stamina bonus to all players
 // that didn't "got wet because of global warming". Return 1 if game ended
-int meltdown(map **m, elf *players, unsigned int staminaBonus,
+int meltdown(map *m, elf *players, unsigned int staminaBonus,
              unsigned int playerCount, FILE *out);
 
 // Moves the elf to a position, check is he has fallen, takes gloves and attacks
