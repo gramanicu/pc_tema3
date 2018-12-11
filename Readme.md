@@ -10,4 +10,11 @@ This is my solution for [the third homework](https://ocw.cs.pub.ro/courses/progr
 - PRINT_SCOREBOARD
 - MELTDOWN
 
+## To Do
+- Use more macros (ex: a macro for unsigned int)
+- review functions & adjust where needed
+- write the actual readme
+- comment the code
+- modularise (where needed)
+
 © 2018 Grama Nicolae
