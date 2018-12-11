@@ -19,11 +19,11 @@ void printSnowstorm(snowstorm *s) {
 }
 
 void setCellHeight(map *m, int x, int y, unsigned int height) {
-    m->cells[y * mapDiameter(m) + x].height = height;
+    m->cells[x * mapDiameter(m) + y].height = height;
 }
 
 void setCellGloves(map *m, int x, int y, unsigned int glove) {
-    m->cells[y * mapDiameter(m) + x].glove = glove;
+    m->cells[x * mapDiameter(m) + y].glove = glove;
 }
 
 void setCell(map *m, int x, int y, unsigned int height, unsigned int glove) {
@@ -36,11 +36,11 @@ int getCellHeight(map *m, int x, int y) {
         x < 0 || y < 0) {
         return -1;
     }
-    return m->cells[y * mapDiameter(m) + x].height;
+    return m->cells[x * mapDiameter(m) + y].height;
 }
 
 unsigned int getCellGloves(map *m, int x, int y) {
-    return m->cells[y * mapDiameter(m) + x].glove;
+    return m->cells[x * mapDiameter(m) + y].glove;
 }
 
 void prepareMap(map *m, unsigned int radius) {
@@ -62,7 +62,7 @@ void generateMap(map *m, unsigned int radius, FILE *in) {
         for (j = 0; j < mapDiameter(m); j++) {
             fscanf(in, "%ud", &height);
             fscanf(in, "%ud", &glove);
-            setCell(m, j, i, height, glove);
+            setCell(m, i, j, height, glove);
         }
     }
 }

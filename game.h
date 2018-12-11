@@ -22,7 +22,7 @@ void spawnPlayers(elf *players, unsigned int playerCount, FILE *in);
 void printPlayers(elf *players, unsigned int playerCount);
 
 // Check if any player has missed the glacier
-void checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out);
+int checkLanding(elf *players, unsigned int *playerCount, map *m, FILE *out);
 
 // Sets the elf health to 0
 void eliminateElf(elf *players, unsigned int id);
@@ -48,8 +48,13 @@ void startGame(char *files);
 void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out);
 
 // Starts a storm at the specified position and damages all players in radius
-void startStorm(snowstorm *s, elf *players, unsigned int playerCount,
-                FILE *out);
+// Return 1 if the game ended
+int startStorm(snowstorm *s, elf *players, unsigned int playerCount, FILE *out);
+
+// Makes the glacier a little smaller, and gives a stamina bonus to all players
+// that didn't "got wet because of global warming". Return 1 if game ended
+int meltdown(map **m, elf *players, unsigned int staminaBonus,
+             unsigned int playerCount, FILE *out);
 
 // Moves the elf to a position, check is he has fallen, takes gloves and attacks
 // (if required). Will return 1 if the game is finished
