@@ -101,7 +101,7 @@ void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out) {
                 if (cont == 1) {
                     return;
                 } else if (cont == -1) {
-                    if(checkFinished(*players, *count, out)) {
+                    if (checkFinished(*players, *count, out)) {
                         break;
                     }
                 }
@@ -289,7 +289,6 @@ int movePlayer(elf *players, map *m, unsigned int id, unsigned int *playerCount,
         return checkFinished(players, *playerCount, out);
     } else {
         takeGloves(players + id, m);
-
         // Check if there is another player at his position
         int defID = playerAtPosition(players, id, *playerCount,
                                      (players + id)->x, (players + id)->y);
@@ -375,7 +374,7 @@ int meltdown(map *m, elf *players, unsigned int staminaBonus,
              unsigned int playerCount, FILE *out) {
     unsigned int i;
     m->radius = m->radius - 1;
-    m->diameter = 2 * m->diameter + 1;
+    m->diameter = 2 * m->radius + 1;
     for (i = 0; i < playerCount; i++) {
         if (!checkPosition(players + i, m)) {
             if ((players + i)->hp != 0) {

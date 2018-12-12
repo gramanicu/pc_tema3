@@ -29,8 +29,9 @@ run: build
 
 #arhiveaza tema
 pack:
+	cp Readme.md README
 	zip $(AFLAGS) $(ANAME) $(ACONTENTS) 
-	
+	rm README
 .PHONY:pack
 
 # sterge executabilul

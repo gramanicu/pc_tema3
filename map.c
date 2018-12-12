@@ -19,11 +19,11 @@ void printSnowstorm(snowstorm *s) {
 }
 
 void setCellHeight(map *m, int x, int y, unsigned int height) {
-    m->cells[x * mapDiameter(m) + y].height = height;
+    m->cells[x * mapOriginalDiameter(m) + y].height = height;
 }
 
 void setCellGloves(map *m, int x, int y, unsigned int glove) {
-    m->cells[x * mapDiameter(m) + y].glove = glove;
+    m->cells[x * mapOriginalDiameter(m) + y].glove = glove;
 }
 
 void setCell(map *m, int x, int y, unsigned int height, unsigned int glove) {
@@ -36,11 +36,11 @@ int getCellHeight(map *m, int x, int y) {
         x < 0 || y < 0) {
         return -1;
     }
-    return m->cells[x * mapDiameter(m) + y].height;
+    return m->cells[x * mapOriginalDiameter(m) + y].height;
 }
 
 unsigned int getCellGloves(map *m, int x, int y) {
-    return m->cells[x * mapDiameter(m) + y].glove;
+    return m->cells[x * mapOriginalDiameter(m) + y].glove;
 }
 
 void prepareMap(map *m, unsigned int radius) {
@@ -56,6 +56,12 @@ unsigned int mapDiameter(map *m) { return m->diameter; }
 
 unsigned int mapArea(map *m) { return pow(mapDiameter(m), 2) + 1; }
 
+unsigned int mapStart(map *m) { return m->center - m->radius; }
+
+unsigned int mapEnd(map *m) { return 2 * m->center + 1 - mapStart(m); }
+
+unsigned int mapOriginalDiameter(map *m) { return 2 * (m->center) + 1; }
+
 void generateMap(map *m, unsigned int radius, FILE *in) {
     unsigned int i, j, height = 0, glove = 0;
     prepareMap(m, radius);
@@ -70,9 +76,19 @@ void generateMap(map *m, unsigned int radius, FILE *in) {
 
 void printHeightmap(map *m) {
     unsigned int i, j;
-    for (i = 0; i < mapDiameter(m); i++) {
-        for (j = 0; j < mapDiameter(m); j++) {
-            printf("%d ", m->cells[i * mapDiameter(m) + j].height);
+    for (i = mapStart(m); i < mapEnd(m); i++) {
+        for (j = mapStart(m); j < mapEnd(m); j++) {
+            printf("%d ", m->cells[i * mapOriginalDiameter(m) + j].height);
+        }
+        printf("\n");
+    }
+}
+
+void printGlovemap(map *m) {
+    unsigned int i, j;
+    for (i = mapStart(m); i < mapEnd(m); i++) {
+        for (j = mapStart(m); j < mapEnd(m); j++) {
+            printf("%d ", m->cells[i * mapOriginalDiameter(m) + j].glove);
         }
         printf("\n");
     }

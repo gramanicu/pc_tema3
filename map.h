@@ -63,6 +63,15 @@ unsigned int mapDiameter(map *m);
 // Returns the map area
 unsigned int mapArea(map *m);
 
+// Returns the upper left corner
+unsigned int mapStart(map *m);
+
+// Returns the lower down corner
+unsigned int mapStart(map *m);
+
+// Returns the original diameter
+unsigned int mapOriginalDiameter(map *m);
+
 // Allocates the memory for the map and sets the radius
 void prepareMap(map *m, unsigned int radius);
 
@@ -75,5 +84,8 @@ void generateMap(map *m, unsigned int radius, FILE *in);
 
 // Shows a map's heightmap - for development purposes
 void printHeightmap(map *m);
+
+// Show all the gloves on the map - for development purposes
+void printGlovemap(map *m);
 
 #endif

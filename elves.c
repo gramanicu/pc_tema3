@@ -46,6 +46,7 @@ void getPosition(elf *e, unsigned int *x, unsigned int *y) {
 
 void takeGloves(elf *e, map *m) {
     // If he found better gloves, he swaps them
+    printf("%d %d\n", e->dmg, getCellGloves(m, e->x, e->y));
     if (e->dmg < getCellGloves(m, e->x, e->y)) {
         unsigned int aux;
         aux = e->dmg;
