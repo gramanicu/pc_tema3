@@ -1,3 +1,4 @@
+// Copyright Grama Nicolae 2018
 #ifndef MAP_H
 #define MAP_H
 #include <stdio.h>

@@ -1,3 +1,4 @@
+// Copyright Grama Nicolae 2018
 #include "map.h"
 #include <math.h>
 #include <stdio.h>

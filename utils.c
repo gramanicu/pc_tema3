@@ -1,3 +1,4 @@
+// Copyright Grama Nicolae 2018
 #include "utils.h"
 #include <math.h>
 #include <memory.h>
