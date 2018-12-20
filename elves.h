@@ -1,3 +1,4 @@
+// Copyright Grama Nicolae 2018
 #ifndef ELVES_H
 #define ELVES_H
 #include "map.h"

@@ -1,3 +1,4 @@
+// Copyright Grama Nicolae 2018
 #include "game.h"
 #include <math.h>
 #include <memory.h>

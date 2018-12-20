@@ -1,3 +1,6 @@
 *.o
 snowfight
 /.vscode
+/tests
+check.sh
+cs.py

@@ -1,3 +1,4 @@
+// Copyright Grama Nicolae 2018
 #include "elves.h"
 #include <memory.h>
 #include <stdio.h>

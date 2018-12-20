@@ -8,8 +8,8 @@ SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
 
 # arhiva checker
-CHECKER = https://ocw.cs.pub.ro/courses/_media/programare/teme_2018/check_gigel.zip
-CARCHIVE = check_gigel.zip
+CHECKER = https://ocw.cs.pub.ro/courses/_media/programare/teme_2018/check_snowfight.zip
+CARCHIVE = check_snowfight.zip
 
 # arhiva cu tema
 ANAME = 312CA_GramaNicolae_Tema3.zip
@@ -28,8 +28,7 @@ run: build
 .PHONY:run
 
 #arhiveaza tema
-pack:
-	cp Readme.md README
+pack:prepare
 	zip $(AFLAGS) $(ANAME) $(ACONTENTS) 
 	rm README
 .PHONY:pack
@@ -65,3 +64,7 @@ MFLAGS = --leak-check=full --show-leak-kinds=all
 memory:
 	valgrind $(MFLAGS) ./$(EXE) date
 .PHONY:memory
+
+prepare:
+	cp Readme.md README
+.PHONY:prepare

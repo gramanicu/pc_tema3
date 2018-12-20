@@ -1,3 +1,4 @@
+// Copyright Grama Nicolae 2018
 #ifndef GAME_H
 #define GAME_H
 #include "elves.h"
