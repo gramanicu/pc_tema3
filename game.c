@@ -11,8 +11,6 @@
 // I supposed an elf can't move more than 100 times at a time
 #define MAX_DIRECTIONS 100
 
-#define MAX_NAME_LENGTH 30
-
 // This is used so i don't repeat this block 3 times in the
 // print leaderboard function
 #define SWITCH_ELVES()                     \
@@ -29,14 +27,14 @@
         ok = 1;                            \
     }
 
-void startGame(char *files) {
+void startGame() {
     map m;
     elf *players;
     unsigned int playerCount;
 
     FILE *in, *out;
 
-    prepareFiles(&in, &out, files);
+    prepareFiles(&in, &out, "snowfight");
     prepareGame(&m, &players, &playerCount, in, out);
     battle(&m, &players, &playerCount, in, out);
 
@@ -63,9 +61,13 @@ void printLeaderboard(elf *players, unsigned int count, FILE *out) {
                 if (eliminated[i] < eliminated[i + 1]) {
                     SWITCH_ELVES();
                 } else if (eliminated[i] == eliminated[i + 1]) {
-                    char curr[MAX_NAME_LENGTH], next[MAX_NAME_LENGTH];
-                    strcpy(curr, (players + id[i])->name);
-                    strcpy(next, (players + id[i + 1])->name);
+                    long int cname_length = strlen((players + id[i])->name);
+                    long int nname_length = strlen((players + id[i + 1])->name);
+                    char curr[cname_length], next[nname_length];
+                    memcpy(curr, (players + id[i])->name,
+                           cname_length * sizeof(char));
+                    memcpy(next, (players + id[i + 1])->name,
+                           nname_length * sizeof(char));
                     if (strcmp(curr, next) > 0) {
                         SWITCH_ELVES();
                     }

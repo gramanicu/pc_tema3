@@ -16,12 +16,16 @@ char isInRadius(elf *e, unsigned int c, unsigned int r) {
 unsigned char getBit(int x, int n) { return (x >> (8 * n)) & 0xFF; }
 
 void prepareFiles(FILE **in, FILE **out, char *filename) {
-    char *inputFile = calloc(strlen(filename) + 4, sizeof(char));
-    char *outputFile = calloc(strlen(filename) + 5, sizeof(char));
-    strcat(inputFile, filename);
-    strcat(outputFile, filename);
-    strcat(inputFile, ".in");
-    strcat(outputFile, ".out");
+    long int inSize = (strlen(filename) + 4) * sizeof(char);
+    long int outSize = (strlen(filename) + 5) * sizeof(char);
+    char *inputFile = malloc(inSize);
+    char *outputFile = malloc(outSize);
+    memcpy(inputFile, filename, strlen(filename) * sizeof(char));
+    memcpy(outputFile, filename, strlen(filename) * sizeof(char));
+    memcpy(inputFile + strlen(filename) * sizeof(char) + 1, ".in",
+           4 * sizeof(char));
+    memcpy(outputFile + strlen(filename) * sizeof(char) + 1, ".out",
+           5 * sizeof(char));
 
     *in = fopen(inputFile, "rt");
     *out = fopen(outputFile, "w");

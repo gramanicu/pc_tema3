@@ -2,10 +2,7 @@
 #include <stdlib.h>
 #include "game.h"
 
-int main(int argc, char *argv[]) {
-    // nu au fost dat numele fisierului de intrare
-    if (argc == 1) exit(0);
-    startGame(argv[1]);
-
+int main() {
+    startGame();
     return 0;
 }

@@ -24,11 +24,11 @@ build: $(OBJ)
 .PHONY:build
 # ruleaza programul
 run: build
-		./$(EXE) date
+		./$(EXE)
 .PHONY:run
 
 #arhiveaza tema
-pack:prepare
+pack:build prepare 
 	zip $(AFLAGS) $(ANAME) $(ACONTENTS) 
 	rm README
 .PHONY:pack
@@ -49,20 +49,15 @@ beauty:
 # descarca arhiva de teste si o pregateste
 update:
 	wget $(CHECKER)
-	unzip -o $(CARCHIVE) -d
+	unzip -o $(CARCHIVE)
 	rm -f $(CARCHIVE)*
 
 .PHONY:update
 
-# verifica doar coding-style
-styleCheck: 
-	-python cs.py $(SOURCE)
-
-.PHONY:styleCheck
-
+# verifica memoria
 MFLAGS = --leak-check=full --show-leak-kinds=all 
 memory:
-	valgrind $(MFLAGS) ./$(EXE) date
+	valgrind $(MFLAGS) ./$(EXE)
 .PHONY:memory
 
 prepare:

@@ -8,7 +8,7 @@
 
 void createElf(elf *e, char *name, int x, int y, int hp, int stamina) {
     e->name = calloc(strlen(name) + 1, sizeof(char));
-    strcpy(e->name, name);
+    memcpy(e->name, name, (strlen(name) + 1) * sizeof(char));
     e->x = x;
     e->y = y;
     e->hp = hp;
@@ -47,7 +47,6 @@ void getPosition(elf *e, unsigned int *x, unsigned int *y) {
 
 void takeGloves(elf *e, map *m) {
     // If he found better gloves, he swaps them
-    printf("%d %d\n", e->dmg, getCellGloves(m, e->x, e->y));
     if (e->dmg < getCellGloves(m, e->x, e->y)) {
         unsigned int aux;
         aux = e->dmg;

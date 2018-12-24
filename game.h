@@ -43,7 +43,7 @@ int playerAtPosition(elf *players, unsigned int exeption,
                      unsigned int playerCount, unsigned int x, unsigned int y);
 
 // Here is all the game logic
-void startGame(char *files);
+void startGame();
 
 // Starts the battle between the elves (reads commands and elves moves)
 void battle(map *m, elf **players, unsigned int *count, FILE *in, FILE *out);
