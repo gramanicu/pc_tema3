@@ -52,14 +52,16 @@ char isOut(elf *players, uint id, map *m);
 
 // Check if there is another elf at the specified position (exeption is the id
 // of the current elf
-int playerAtPosition(elf *players, uint exeption, uint playerCount, uint x, uint y);
+int playerAtPosition(elf *players, uint exeption, uint playerCount, uint x,
+                     uint y);
 
 // Starts the fight between two elves. If the one who got second into the
 // cell won, the function returns 1. Else, it returns 0
 int fight(elf *att, elf *def);
 
 // Moves the player into a cell
-int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move, FILE *out);
+int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
+               FILE *out);
 
 int main() {
     map m;
@@ -97,7 +99,10 @@ void battle(map *m, elf **players, uint *count, FILE *in, FILE *out) {
             fscanf(in, "%ud", &id);
             fscanf(in, "%s", directions);
             for (i = 0; i < strlen(directions); i++) {
-                if(movePlayer(*players, m, id, count, directions[i], out)==1) { break; }
+                if (movePlayer(*players, m, id, count, directions[i], out) ==
+                    1) {
+                    break;
+                }
             }
         } else if (strcmp(command, "SNOWSTORM") == 0) {
             fscanf(in, "%d", &k);
@@ -305,7 +310,8 @@ int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
     return 0;
 }
 
-int playerAtPosition(elf *players, uint exeption, uint playerCount, uint x, uint y) {
+int playerAtPosition(elf *players, uint exeption, uint playerCount, uint x,
+                     uint y) {
     uint i;
     for (i = 0; i < playerCount; i++) {
         if (i != exeption) {
@@ -318,7 +324,6 @@ int playerAtPosition(elf *players, uint exeption, uint playerCount, uint x, uint
     }
     return -1;
 }
-
 
 char isOut(elf *players, uint id, map *m) {
     if (!checkPosition(players + id, m)) {

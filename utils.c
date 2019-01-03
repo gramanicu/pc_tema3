@@ -1,5 +1,5 @@
 // Copyright Grama Nicolae 2018
-#include "utils.h"
+#include "./utils.h"
 #include <stdio.h>
 
 char isInRadius(elf *e, uint c, uint r) {
