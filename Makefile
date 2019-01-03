@@ -56,7 +56,7 @@ update:
 
 # verifica memoria
 MFLAGS = --leak-check=full --show-leak-kinds=all 
-memory:
+memory:build
 	valgrind $(MFLAGS) ./$(EXE)
 .PHONY:memory
 
