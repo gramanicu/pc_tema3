@@ -22,8 +22,8 @@
         ok = 1;                            \
     }
 
-#define PRINT_ELVES_BOARD(...)                                             \
-    fprintf(out, "%s \t %s \t %d\n", (players + id[i])->name, __VA_ARGS__, \
+#define PRINT_ELVES_BOARD(...)                                         \
+    fprintf(out, "%s\t%s\t%d\n", (players + id[i])->name, __VA_ARGS__, \
             eliminated[i]);
 
 /*  It will prepare the game and "return" (using pointers)
@@ -78,6 +78,9 @@ void checkLanding(elf *players, map *m, uint *playerCount, FILE *in, FILE *out);
 // Check if the game has ended
 int checkFinished(elf *players, uint playerCount, FILE *out);
 
+// DEVELOPMENT
+void printPlayerPositions(elf *players, uint playerCount);
+
 int main() {
     map m;
     elf *players;
@@ -98,6 +101,7 @@ void prepareGame(map *m, elf **players, uint *count, FILE *in, FILE *out) {
     fscanf(in, "%ud", &playerCount);
 
     generateMap(m, radius, radius, in);
+    // printHeightmap(m);
 
     *players = calloc(playerCount, sizeof(elf));
     spawnPlayers(*players, playerCount, in);
@@ -110,6 +114,7 @@ void spawnPlayers(elf *players, uint playerCount, FILE *in) {
     uint i, x, y, hp, stamina;
     char name[50];
     for (i = 0; i < playerCount; i++) {
+        memset(name, 0, 50 * sizeof(char));
         fscanf(in, "%s", name);
         fscanf(in, "%ud", &x);
         fscanf(in, "%ud", &y);
@@ -292,65 +297,47 @@ void checkLanding(elf *players, map *m, uint *playerCount, FILE *in,
 int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
                FILE *in, FILE *out) {
     if ((players + id)->hp == 0) return 1;
-    uint x, y, fallen = 0;
-    int height;
+    // printPlayerPositions(players, *playerCount);
+    // printf("%s will move %c\n", (players + id)->name, move);
+    uint x, y, newX, newY;
     getPosition(players + id, &x, &y);
     switch (move) {
         // Will do the move only if he has enough stamina
         case 'U':
-            height = getCellHeight(m, x - 1, y);
-            if (height != -1) {
-                if (getStamina(players + id) >= (uint)height) {
-                    setPosition(players + id, x - 1, y);
-                }
-            } else {
-                fallen = 1;
-            }
+            newX = x - 1;
+            newY = y;
             break;
         case 'D':
-            height = getCellHeight(m, x + 1, y);
-            if (height != -1) {
-                if (getStamina(players + id) >= (uint)height) {
-                    setPosition(players + id, x + 1, y);
-                }
-            } else {
-                fallen = 1;
-            }
+            newX = x + 1;
+            newY = y;
             break;
         case 'R':
-            height = getCellHeight(m, x, y + 1);
-            if (height != -1) {
-                if (getStamina(players + id) >= (uint)height) {
-                    setPosition(players + id, x, y + 1);
-                }
-            } else {
-                fallen = 1;
-            }
+            newX = x;
+            newY = y + 1;
             break;
         case 'L':
-            height = getCellHeight(m, x, y - 1);
-            if (height != -1) {
-                if (getStamina(players + id) >= (uint)height) {
-                    setPosition(players + id, x, y - 1);
-                }
-            } else {
-                fallen = 1;
-            }
+            newX = x;
+            newY = y - 1;
             break;
-
-            // Verifies if he fell out of the map
-            if (!fallen) {
-                // Consumes the stamina required to climb the hill
-                uint ax, ay;
-                getPosition(players + id, &ax, &ay);
-                uint loss;
-                loss = getCellHeight(m, x, y) - getCellHeight(m, ax, ay);
-                setStamina(players + id, loss);
-            }
     }
 
-    if (isOut(players, id, m) || fallen) {
-        fprintf(out, "%s fell of the glacier.\n", (players + id)->name);
+    uint loss;
+    if (getCellHeight(m, newX, newY) > getCellHeight(m, x, y)) {
+        loss = getCellHeight(m, newX, newY) - getCellHeight(m, x, y);
+    } else {
+        loss = (uint)0;
+    }
+    // printf("%s will lose %u stamina\n", (players + id)->name, loss);
+    if (getStamina(players + id) >= loss) {
+        setPosition(players + id, newX, newY);
+        setStamina(players + id, (players + id)->stamina - loss);
+    }
+
+    // printPlayerPositions(players, *playerCount);
+    // printf("\n\n");
+
+    if (isOut(players, id, m)) {
+        fprintf(out, "%s fell off the glacier.\n", (players + id)->name);
         eliminateElf(m, players, id, *playerCount, in, out);
     } else {
         takeGloves(players + id, m);
@@ -428,5 +415,14 @@ int fight(elf *att, elf *def) {
             }
             turn = 1;
         }
+    }
+}
+
+void printPlayerPositions(elf *players, uint playerCount) {
+    uint i;
+    printf("Positions:\n");
+    for (i = 0; i < playerCount; i++) {
+        printf("%s is at %u %u\n", (players + i)->name, (players + i)->x,
+               (players + i)->y);
     }
 }
