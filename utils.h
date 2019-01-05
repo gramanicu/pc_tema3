@@ -8,6 +8,7 @@
 
 #define MAX_SIZE 100
 #define uint unsigned int
+#define lint long int
 
 typedef struct elfStruct elf;
 typedef struct mapStruct map;

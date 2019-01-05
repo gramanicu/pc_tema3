@@ -1,7 +1,7 @@
 # Copyright 2018 Grama Nicolae
 
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -O3 -Wno-unused-result
+CFLAGS = -Wall -Wextra -pedantic -std=c99 -O3 -Wno-unused-result -g
 LFLAGS = -lm
 EXE = snowfight
 SRC = $(wildcard *.c)

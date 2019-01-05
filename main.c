@@ -22,6 +22,10 @@
         ok = 1;                            \
     }
 
+#define PRINT_ELVES_BOARD(...)                                             \
+    fprintf(out, "%s \t %s \t %d\n", (players + id[i])->name, __VA_ARGS__, \
+            eliminated[i]);
+
 /*  It will prepare the game and "return" (using pointers)
     the map, players and player count, so we can deallocate the
     memory at the end of execution
@@ -39,13 +43,15 @@ void battle(map *m, elf **players, uint *count, FILE *in, FILE *out);
 
 // Implementation for the MELTDOWN command
 void meltdown(map *m, elf *players, uint staminaBonus, uint playerCount,
-              FILE *out);
+              FILE *in, FILE *out);
 
 // Soaks an elf
-void eliminateElf(elf *players, uint id);
+void eliminateElf(map *m, elf *players, uint id, uint playerCount, FILE *in,
+                  FILE *out);
 
 // Implementation for the SNOWSTORM command
-void startStorm(snowstorm *s, elf *players, uint playerCount, FILE *out);
+void startStorm(snowstorm *s, map *m, elf *players, uint playerCount, FILE *in,
+                FILE *out);
 
 // Check if the elf has fallen off the glacier
 char isOut(elf *players, uint id, map *m);
@@ -61,7 +67,16 @@ int fight(elf *att, elf *def);
 
 // Moves the player into a cell
 int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
-               FILE *out);
+               FILE *in, FILE *out);
+
+// Reads player information from the file and spawns the elves
+void spawnPlayers(elf *players, uint playerCount, FILE *in);
+
+// Check if any player has missed the glacier
+void checkLanding(elf *players, map *m, uint *playerCount, FILE *in, FILE *out);
+
+// Check if the game has ended
+int checkFinished(elf *players, uint playerCount, FILE *out);
 
 int main() {
     map m;
@@ -85,6 +100,25 @@ void prepareGame(map *m, elf **players, uint *count, FILE *in, FILE *out) {
     fscanf(in, "%ud", &playerCount);
 
     generateMap(m, radius, radius, in);
+
+    *players = calloc(playerCount, sizeof(elf));
+    spawnPlayers(*players, playerCount, in);
+    checkLanding(*players, m, &playerCount, in, out);
+
+    *count = playerCount;
+}
+
+void spawnPlayers(elf *players, uint playerCount, FILE *in) {
+    uint i, x, y, hp, stamina;
+    char name[50];
+    for (i = 0; i < playerCount; i++) {
+        fscanf(in, "%s", name);
+        fscanf(in, "%ud", &x);
+        fscanf(in, "%ud", &y);
+        fscanf(in, "%ud", &hp);
+        fscanf(in, "%ud", &stamina);
+        createElf(players + i, name, x, y, hp, stamina);
+    }
 }
 
 void battle(map *m, elf **players, uint *count, FILE *in, FILE *out) {
@@ -99,8 +133,8 @@ void battle(map *m, elf **players, uint *count, FILE *in, FILE *out) {
             fscanf(in, "%ud", &id);
             fscanf(in, "%s", directions);
             for (i = 0; i < strlen(directions); i++) {
-                if (movePlayer(*players, m, id, count, directions[i], out) ==
-                    1) {
+                if (movePlayer(*players, m, id, count, directions[i], in,
+                               out) == 1) {
                     break;
                 }
             }
@@ -109,14 +143,14 @@ void battle(map *m, elf **players, uint *count, FILE *in, FILE *out) {
             snowstorm *storm = malloc(sizeof(snowstorm));
             parseSnowstorm(k, storm);
 
-            startStorm(storm, *players, *count, out);
+            startStorm(storm, m, *players, *count, in, out);
 
             free(storm);
         } else if (strcmp(command, "PRINT_SCOREBOARD") == 0) {
             printLeaderboard(*players, *count, out);
         } else if (strcmp(command, "MELTDOWN") == 0) {
             fscanf(in, "%ud", &stamina);
-            meltdown(m, *players, stamina, *count, out);
+            meltdown(m, *players, stamina, *count, in, out);
         }
     }
 }
@@ -139,8 +173,8 @@ void printLeaderboard(elf *players, uint count, FILE *out) {
                 if (eliminated[i] < eliminated[i + 1]) {
                     SWITCH_ELVES();
                 } else if (eliminated[i] == eliminated[i + 1]) {
-                    long int cname_length = strlen((players + id[i])->name);
-                    long int nname_length = strlen((players + id[i + 1])->name);
+                    lint cname_length = strlen((players + id[i])->name);
+                    lint nname_length = strlen((players + id[i + 1])->name);
                     char curr[cname_length], next[nname_length];
                     memcpy(curr, (players + id[i])->name,
                            cname_length * sizeof(char));
@@ -157,11 +191,9 @@ void printLeaderboard(elf *players, uint count, FILE *out) {
     fprintf(out, "SCOREBOARD:\n");
     for (i = 0; i < count; i++) {
         if (status[i]) {
-            fprintf(out, "%s \t %s \t %d\n", (players + id[i])->name, "DRY",
-                    eliminated[i]);
+            PRINT_ELVES_BOARD("DRY");
         } else {
-            fprintf(out, "%s \t %s \t %d\n", (players + id[i])->name, "WET",
-                    eliminated[i]);
+            PRINT_ELVES_BOARD("WET");
         }
     }
 }
@@ -176,10 +208,11 @@ void releaseMemory(map *m, elf *players, uint playerCount, FILE *in,
     free(players);
     fclose(in);
     fclose(out);
+    exit(0);
 }
 
 void meltdown(map *m, elf *players, uint staminaBonus, uint playerCount,
-              FILE *out) {
+              FILE *in, FILE *out) {
     uint i;
     reduceMap(m);
 
@@ -188,7 +221,7 @@ void meltdown(map *m, elf *players, uint staminaBonus, uint playerCount,
             if ((players + i)->hp != 0) {
                 fprintf(out, "%s got wet because of global warming.\n",
                         (players + i)->name);
-                eliminateElf(players, i);
+                eliminateElf(m, players, i, playerCount, in, out);
             }
         } else {
             setStamina(players + i, getStamina(players + i) + staminaBonus);
@@ -197,9 +230,34 @@ void meltdown(map *m, elf *players, uint staminaBonus, uint playerCount,
 }
 
 // !!!!!!!!!!!!!!!!!! Move the ending conditions here !!!!!!!!!!!!!!!!!!!!!!
-void eliminateElf(elf *players, uint id) { (players + id)->hp = 0; }
+void eliminateElf(map *m, elf *players, uint id, uint playerCount, FILE *in,
+                  FILE *out) {
+    (players + id)->hp = 0;
+    if (checkFinished(players, playerCount, out)) {
+        releaseMemory(m, players, playerCount, in, out);
+    }
+}
 
-void startStorm(snowstorm *s, elf *players, uint playerCount, FILE *out) {
+// Returns 1 if the game is ended
+int checkFinished(elf *players, uint playerCount, FILE *out) {
+    int alive = 0;
+    uint i, id = 0;
+    for (i = 0; i < playerCount; i++) {
+        if ((players + i)->hp > 0) {
+            alive++;
+            id = i;
+        }
+    }
+    if (alive == 1) {
+        fprintf(out, "%s has won!\n", (players + id)->name);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+void startStorm(snowstorm *s, map *m, elf *players, uint playerCount, FILE *in,
+                FILE *out) {
     uint i;
     for (i = 0; i < playerCount; i++) {
         uint x = (players + i)->x;
@@ -211,16 +269,30 @@ void startStorm(snowstorm *s, elf *players, uint playerCount, FILE *out) {
                 if ((players + i)->hp == 0) {
                     fprintf(out, "%s was hit by snowstorm.\n",
                             (players + i)->name);
-                    eliminateElf(players, i);
+                    eliminateElf(m, players, i, playerCount, in, out);
                 }
             }
         }
     }
 }
 
+void checkLanding(elf *players, map *m, uint *playerCount, FILE *in,
+                  FILE *out) {
+    uint i;
+    for (i = 0; i < *playerCount; i++) {
+        // If he hasn't landed on the glacier
+        if (!checkPosition(players + i, m)) {
+            fprintf(out, "%s has missed the glacier.\n", (players + i)->name);
+            eliminateElf(m, players, i, *playerCount, in, out);
+        } else {
+            takeGloves(players + i, m);
+        }
+    }
+}
+
 // Will return 1 if the elf was soaked
 int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
-               FILE *out) {
+               FILE *in, FILE *out) {
     if ((players + id)->hp == 0) return 1;
     uint x, y, fallen = 0;
     int height;
@@ -281,7 +353,7 @@ int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
 
     if (isOut(players, id, m) || fallen) {
         fprintf(out, "%s fell of the glacier.\n", (players + id)->name);
-        eliminateElf(players, id);
+        eliminateElf(m, players, id, *playerCount, in, out);
     } else {
         takeGloves(players + id, m);
         // Check if there is another player at his position
@@ -295,14 +367,14 @@ int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
                             (players + id)->name, (players + defID)->name);
                     (players + id)->stamina = (players + defID)->stamina;
                     (players + id)->won = (players + id)->won + 1;
-                    eliminateElf(players, defID);
+                    eliminateElf(m, players, defID, *playerCount, in, out);
                 } else {
                     // he lost the fight
                     fprintf(out, "%s sent %s back home.\n",
                             (players + defID)->name, (players + id)->name);
                     (players + defID)->stamina = (players + id)->stamina;
                     (players + defID)->won = (players + defID)->won + 1;
-                    eliminateElf(players, id);
+                    eliminateElf(m, players, id, *playerCount, in, out);
                 }
             }
         }
