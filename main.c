@@ -87,9 +87,7 @@ int main() {
     prepareFiles(&in, &out);
     prepareGame(&m, &players, &playerCount, in, out);
     battle(&m, &players, &playerCount, in, out);
-
     releaseMemory(&m, players, playerCount, in, out);
-
     return 0;
 }
 
@@ -229,7 +227,7 @@ void meltdown(map *m, elf *players, uint staminaBonus, uint playerCount,
     }
 }
 
-// !!!!!!!!!!!!!!!!!! Move the ending conditions here !!!!!!!!!!!!!!!!!!!!!!
+// Eliminates an elf and checks if the game is finished
 void eliminateElf(map *m, elf *players, uint id, uint playerCount, FILE *in,
                   FILE *out) {
     (players + id)->hp = 0;
@@ -249,7 +247,7 @@ int checkFinished(elf *players, uint playerCount, FILE *out) {
         }
     }
     if (alive == 1) {
-        fprintf(out, "%s has won!\n", (players + id)->name);
+        fprintf(out, "%s has won.\n", (players + id)->name);
         return 1;
     } else {
         return 0;
@@ -365,14 +363,14 @@ int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
                     // he won the fight
                     fprintf(out, "%s sent %s back home.\n",
                             (players + id)->name, (players + defID)->name);
-                    (players + id)->stamina = (players + defID)->stamina;
+                    (players + id)->stamina += (players + defID)->stamina;
                     (players + id)->won = (players + id)->won + 1;
                     eliminateElf(m, players, defID, *playerCount, in, out);
                 } else {
                     // he lost the fight
                     fprintf(out, "%s sent %s back home.\n",
                             (players + defID)->name, (players + id)->name);
-                    (players + defID)->stamina = (players + id)->stamina;
+                    (players + defID)->stamina += (players + id)->stamina;
                     (players + defID)->won = (players + defID)->won + 1;
                     eliminateElf(m, players, id, *playerCount, in, out);
                 }

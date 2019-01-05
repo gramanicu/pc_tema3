@@ -141,6 +141,9 @@ uint getCellGloves(map *m, int x, int y);
 // Returns the map diameter (size of one side of the square)
 uint mapDiameter(map *m);
 
+// Returns the original diameter (before any meltdowns)
+uint mapOriginalDiameter(map *m);
+
 // Returns the map area
 uint mapArea(map *m);
 
