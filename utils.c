@@ -1,11 +1,14 @@
 // Copyright Grama Nicolae 2018
 #include "./utils.h"
-#include <stdio.h>
 
-char isInRadius(elf *e, uint c, uint r) {
-    uint x = e->x;
-    uint y = e->y;
+char isInRadius(elf *e, uint center, uint radius) {
+    double x = (double)e->x;
+    double y = (double)e->y;
+    double c = (double)center;
+    double r = (double)radius;
+
     double lenght = sqrt((x - c) * (x - c) + (y - c) * (y - c));
+    if (strcmp(e->name, "Arturo") == 0) printf("%lf, %lf\n", lenght, r);
     return lenght <= r ? 1 : 0;
 }
 
@@ -117,7 +120,8 @@ cell *accessCell(map *m, int x, int y) {
 }
 
 int getCellHeight(map *m, int x, int y) {
-    if ((uint)x >= m->diameter || (uint)y >= m->diameter || x < 0 || y < 0) {
+    if ((uint)x >= (m->center) * 2 + 1 || (uint)y >= (m->center) * 2 + 1 ||
+        x < 0 || y < 0) {
         return -1;
     }
     return (*accessCell(m, x, y)).height;
@@ -175,11 +179,6 @@ void reduceMap(map *origin) {
         a++;
     }
     a = 0;
-
-    // Free all unused memory
-    for (i = 0; i < mapDiameter(origin); i++) {
-        // TO DO
-    }
 }
 
 void printHeightmap(map *m) {

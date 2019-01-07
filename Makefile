@@ -63,3 +63,7 @@ memory:build
 prepare:
 	cp Readme.md README
 .PHONY:prepare
+
+check:update build prepare
+	./check.sh
+.PHONT:check
