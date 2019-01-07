@@ -103,9 +103,6 @@ void prepareGame(map *m, elf **players, uint *count, FILE *in, FILE *out) {
     spawnPlayers(*players, playerCount, in);
     checkLanding(*players, m, &playerCount, in, out);
 
-    printHeightmap(m);
-    printPlayerPositions(*players, playerCount);
-
     *count = playerCount;
 }
 
