@@ -322,12 +322,7 @@ int movePlayer(elf *players, map *m, uint id, uint *playerCount, char move,
             break;
     }
 
-    uint loss;
-    if (getCellHeight(m, newX, newY) > getCellHeight(m, x, y)) {
-        loss = getCellHeight(m, newX, newY) - getCellHeight(m, x, y);
-    } else {
-        loss = (uint)0;
-    }
+    uint loss = abs(getCellHeight(m, newX, newY) - getCellHeight(m, x, y));
 
     if (getStamina(players + id) >= loss) {
         setPosition(players + id, newX, newY);

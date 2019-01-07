@@ -8,7 +8,6 @@ char isInRadius(elf *e, uint center, uint radius) {
     double r = (double)radius;
 
     double lenght = sqrt((x - c) * (x - c) + (y - c) * (y - c));
-    if (strcmp(e->name, "Arturo") == 0) printf("%lf, %lf\n", lenght, r);
     return lenght <= r ? 1 : 0;
 }
 

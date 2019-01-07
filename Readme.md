@@ -38,4 +38,11 @@ rewrite a lot of the function in main.c so they would pass on the arguments
 needed by the releaseMemory function (pointer to the map, players and their 
 total number, input & output files).
 
+- Probably, the hardest task was to figure out what was wrong with the 
+program, when the checker said that tests 6,7,8 & 9 had a "WA" flag.
+Everything looks fine about the distance formula, and on a manual
+check (with a pen and paper), the program was not wrong. In the 6th
+test, for example, on paper Arturo should really do 4 moves, falling
+off the glacier on the last one ...
+
 © 2018 Grama Nicolae, 312CA
